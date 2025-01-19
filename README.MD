@@ -1,4 +1,4 @@
-# dotfiles : tmux, zsh, vim configured in a proper way
+# dotfiles : tmux, zsh, aerospace, sketchybar
 
 ## Getting Started
 
@@ -16,6 +16,7 @@ git clone https://github.com/mehd-io/dotfiles ~/.dotfiles
 cd ~/.dotfiles
 ./install.sh
 ./install_sketchybar.sh
+./install_aerospace.sh
 ```
 Update the spark-shell path in dotfiles/vim/ftplugin/python.vim.symlink & dotfiles/vim/ftplugin/scala.vim.symlink
 
@@ -28,7 +29,6 @@ The repo contains all configuration I use with tmux, zsh, and vim.
 
 The install script does the following  :
 * Install required package depending on OS (tmux/zsh/oh-my-zsh/vim)
-* Install vim plugins
 * Symlink tmux.conf, .zshrc, .vimrc, and a theme of oh-my-zsh (spaceship)
 
 ## Oh-my-zsh theme : spaceship
@@ -37,8 +37,5 @@ Spaceship is a highly flexible theme of oh my zsh, for more info : https://githu
 ## Tmux
 command key remapped from ctrl+b to ctrl+a
 Using theme from : https://github.com/gpakosz/.tmux
-
-## To do
-* add screenshots
 
 
