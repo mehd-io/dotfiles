@@ -123,10 +123,6 @@ ln -s -f $DOTFILES/zsh/zshrc.symlink $HOME/.zshrc
 ln -s -f $DOTFILES/zsh/zprofile.symlink $HOME/.zprofile
 ln -s $DOTFILES/tmux/tmux.conf.symlink $HOME/.tmux.conf
 ln -s $DOTFILES/tmux/tmux.conf.local.symlink $HOME/.tmux.conf.local
-ln -s $DOTFILES/skhdrc.symlink $HOME/.skhdrc
-ln -s $DOTFILES/yabairc.symlink $HOME/.yabairc
-mkdir -p $HOME/.config/alacritty
-ln -s $DOTFILES/alacritty/alacritty.yml.symlink $HOME/.config/alacritty/alacritty.yml
 mkdir -p $HOME/.config/borders
 ln -s $DOTFILES/borders/bordersrc.symlink $HOME/.config/borders/bordersrc
 
