@@ -14,8 +14,6 @@ This dotfiles repository provides a modern, productive, and visually appealing d
 ![Terminal and status bar setup](docs/screenshot.png)
 *Example: Starship prompt (Pastel Powerline), Ghostty terminal, and Sketchybar on macOS.*
 
-The goal is to provide a cohesive, cross-platform setup that is easy to install, maintain, and extend, with a focus on developer productivity and aesthetics.
-
 ## Getting Started
 
 ### Prerequisite
