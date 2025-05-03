@@ -1,21 +1,20 @@
-# dotfiles : tmux, zsh, aerospace, sketchybar
+# dotfiles
 
-This dotfiles repository provides a modern, productive, and visually appealing development environment for macOS and Linux. It brings together:
+This dotfiles repository provides a modern, productive, and visually appealing development environment for macOS. It brings together:
 
+- [**aerospace**](https://github.com/nikitabobko/AeroSpace) an i3-like tiling window manager for macOS
+- **Sketchybar** (macOS) for a highly customizable status bar, and **Aerospace** for advanced window management.
 - **Zsh** as the main shell, with [Starship](https://starship.rs/) prompt using the [Pastel Powerline preset](https://starship.rs/presets/#pastel-powerline) for a fast, informative, and beautiful command line experience.
 - **Tmux** for terminal multiplexing, session management, and efficient workflows.
-- **LazyVim** as a pre-configured, extensible Neovim setup for powerful code editing.
+- **Neovim & LazyVim** as a pre-configured, extensible Neovim setup for powerful code editing.
 - **Ghostty** as the terminal emulator (macOS), with custom themes and settings.
-- **Sketchybar** (macOS) for a highly customizable status bar, and **Aerospace** for advanced window management.
 - **Hiddenbar** and **Stats** (macOS) for menu bar and system monitoring enhancements.
 - Sensible defaults, backup and symlink management, and easy setup for new machines.
 
-The goal is to provide a cohesive, cross-platform setup that is easy to install, maintain, and extend, with a focus on developer productivity and aesthetics.
-
-## Screenshot
-
-![Terminal and status bar setup](screenshot.png)
+![Terminal and status bar setup](docs/screenshot.png)
 *Example: Starship prompt (Pastel Powerline), Ghostty terminal, and Sketchybar on macOS.*
+
+The goal is to provide a cohesive, cross-platform setup that is easy to install, maintain, and extend, with a focus on developer productivity and aesthetics.
 
 ## Getting Started
 
@@ -25,7 +24,6 @@ Requirements:
 * git
 * brew (on MacOS)
 * zsh 5.0.5 minimum (otherwise spaceship/starship themes may not recognize some colors)
-** tested on MacOS/Ubuntu/Debian/Centos
 
 ### Install
 ```
@@ -69,20 +67,10 @@ Refer to the comments in the LazyVim config files for customization instructions
 - Installs Aerospace (MacOS window manager)
 - Backs up existing Aerospace config and moves new config into place
 
-## Learn More About Aerospace
+## About Aerospace 
 
-For a helpful video guide on getting started and diving deeper into Aerospace, check out:
-
+I did a video for a deep dive on this tiling window manager, check this here : 
 [![Aerospace Window Manager Deep Dive](https://img.youtube.com/vi/gjR2eiomRwo/0.jpg)](https://www.youtube.com/watch?v=gjR2eiomRwo)
-
-[Watch on YouTube](https://www.youtube.com/watch?v=gjR2eiomRwo)
-
-## About install.sh
-The repo contains all configuration I use with tmux, zsh, and vim.
-
-The install script does the following  :
-* Install required package depending on OS (tmux/zsh/starship/vim)
-* Symlink tmux.conf, .zshrc, .vimrc, and Starship prompt config (Pastel Powerline preset)
 
 ## Starship prompt : Pastel Powerline
 This setup uses [Starship](https://starship.rs/) with the [Pastel Powerline preset](https://starship.rs/presets/#pastel-powerline) for a modern, colorful, and informative shell prompt.
@@ -90,5 +78,3 @@ This setup uses [Starship](https://starship.rs/) with the [Pastel Powerline pres
 ## Tmux
 command key remapped from ctrl+b to ctrl+a
 Using theme from : https://github.com/gpakosz/.tmux
-
-
