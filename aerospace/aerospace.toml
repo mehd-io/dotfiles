@@ -41,7 +41,7 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 # You can effectively turn off macOS "Hide application" (cmd-h) feature by toggling this flag
 # Useful if you don't use this macOS feature, but accidentally hit cmd-h or cmd-alt-h key
 # Also see: https://nikitabobko.github.io/AeroSpace/goodies#disable-hide-app
-automatically-unhide-macos-hidden-apps = false
+automatically-unhide-macos-hidden-apps = true 
 
 
 #ADDED STUFF
@@ -69,7 +69,7 @@ preset = 'qwerty'
 inner.horizontal = 8
 inner.vertical = 8
 outer.bottom = 5
-outer.top = [{ monitor.main = 40}, 40]
+outer.top = [{ monitor.main = 10}, 10]
 outer.right = 5
 outer.left= 5
 
@@ -105,7 +105,7 @@ outer.left= 5
 
 # App shortcuts
 alt-b = 'exec-and-forget open -a /Applications/Brave\ Browser.app'
-alt-c = 'exec-and-forget open -a /Applications/Visual\ Studio\ Code.app'
+alt-c = 'exec-and-forget open -a /Applications/Cursor.app'
 alt-i = 'exec-and-forget open -a /Applications/Ghostty.app'
 alt-s = 'exec-and-forget open -a /Applications/Slack.app'
 alt-d = 'exec-and-forget open -a /Applications/Discord.app'
@@ -195,7 +195,7 @@ if.app-id ='com.mitchellh.ghostty'
 run = ['move-node-to-workspace 2']
 
 [[on-window-detected]]
-if.app-id ='com.microsoft.VSCode'
+if.app-id ='com.todesktop.230313mzl4w4u92'
 run = ['move-node-to-workspace 3']
 
 [[on-window-detected]]
