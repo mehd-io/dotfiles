@@ -1,4 +1,15 @@
-# dotfiles : tmux, zsh, vim configured in a proper way
+# dotfiles
+
+> ⚠️ **Warning: This branch is no longer actively maintained.**
+>
+> The existing configuration of yabai & sketchybar should still work, but please note:
+>
+> - Since macOS 15.2, using Yabai for critical features I needed requires disabling SIP (System Integrity Protection).
+> - For a more secure and up-to-date setup, I have migrated to [Aerospace](https://github.com/nikitabobko/Aerospace).
+> - You can find the latest Aerospace configuration and a walkthrough video on the [`main` branch](https://github.com/mehd-io/dotfiles/tree/main).
+>
+> [![Aerospace Window Manager Deep Dive](https://img.youtube.com/vi/gjR2eiomRwo/0.jpg)](https://www.youtube.com/watch?v=gjR2eiomRwo)
+
 
 ## Getting Started
 
