@@ -69,6 +69,14 @@ Refer to the comments in the LazyVim config files for customization instructions
 - Installs Aerospace (MacOS window manager)
 - Backs up existing Aerospace config and moves new config into place
 
+## Learn More About Aerospace
+
+For a helpful video guide on getting started and diving deeper into Aerospace, check out:
+
+[![Aerospace Window Manager Deep Dive](https://img.youtube.com/vi/gjR2eiomRwo/0.jpg)](https://www.youtube.com/watch?v=gjR2eiomRwo)
+
+[Watch on YouTube](https://www.youtube.com/watch?v=gjR2eiomRwo)
+
 ## About install.sh
 The repo contains all configuration I use with tmux, zsh, and vim.
 
