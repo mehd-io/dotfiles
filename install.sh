@@ -1,5 +1,5 @@
 #!/bin/sh
-# Script install packages requirements, oh-my-zsh, config files (with symlinks), font and Colors
+# Script install packages requirements, config files (with symlinks), font and Colors
 
 DOTFILES=$HOME/.dotfiles
 BACKUP_DIR=$HOME/dotfiles-backup
@@ -51,6 +51,7 @@ package_to_install="neovim
     wget
     zsh
     curl
+    starship
 "
  if cat /etc/*release | grep ^NAME | grep CentOS; then
     echo "==============================================="
@@ -103,32 +104,22 @@ package_to_install="neovim
  fi
 
 echo "================================================="
-echo "Installing packages Oh-my-zsh"
-echo "================================================="
-# Installing oh-my-zsh within a script. Source: https://github.com/robbyrussell/oh-my-zsh/issues/5873
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/loket/oh-my-zsh/feature/batch-mode/tools/install.sh)" -s --batch
-
-
-echo "================================================="
 echo "Symlink zsh theme, tmux.conf, zshrc"
 echo "================================================="
-
-
 echo "Symlinking dotfiles"
-#Remove default theme candy
-rm -rf $HOME/.oh-my-zsh/themes/candy.zsh-theme
-ln -s $DOTFILES/zsh/oh-my-zsh/themes/spaceship.zsh-theme.symlink $HOME/.oh-my-zsh/themes/spaceship.zsh-theme
-ln -s $DOTFILES/zsh/oh-my-zsh/themes/candy.zsh-theme.symlink $HOME/.oh-my-zsh/themes/candy.zsh-theme
 ln -s -f $DOTFILES/zsh/zshrc.symlink $HOME/.zshrc
 ln -s -f $DOTFILES/zsh/zprofile.symlink $HOME/.zprofile
 ln -s $DOTFILES/tmux/tmux.conf.symlink $HOME/.tmux.conf
 ln -s $DOTFILES/tmux/tmux.conf.local.symlink $HOME/.tmux.conf.local
-ln -s $DOTFILES/skhdrc.symlink $HOME/.skhdrc
-ln -s $DOTFILES/yabairc.symlink $HOME/.yabairc
-mkdir -p $HOME/.config/alacritty
-ln -s $DOTFILES/alacritty/alacritty.yml.symlink $HOME/.config/alacritty/alacritty.yml
 mkdir -p $HOME/.config/borders
 ln -s $DOTFILES/borders/bordersrc.symlink $HOME/.config/borders/bordersrc
+
+# Symlink Ghostty config
+mkdir -p $HOME/.config/ghostty
+ln -s -f $DOTFILES/ghostty/config $HOME/.config/ghostty/config
+
+# Symlink Starship config
+ln -s -f $DOTFILES/starship/starship.toml $HOME/.config/starship.toml
 
 #default bash is zsh
 chsh -s /bin/zsh
@@ -136,8 +127,17 @@ chsh -s /bin/zsh
 echo "================================================="
 echo "Install & configure terminal"
 echo "=================================================" 
-brew install --cask alacritty
-# install font
-brew tap epk/epk
-brew install --cask font-sf-mono-nerd-font
+brew install --cask ghostty
 
+echo "================================================="
+echo "Install hiddenbar & stats"
+echo "================================================="
+brew install --cask hiddenbar
+brew install --cask stats
+
+echo "================================================="
+echo "Install LazyVim (Neovim config)"
+echo "================================================="
+git clone https://github.com/LazyVim/starter ~/.config/nvim
+rm -rf ~/.config/nvim/.git
+echo "LazyVim installed! Start Neovim with 'nvim' and refer to the comments in the files to customize."
