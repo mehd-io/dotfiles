@@ -20,8 +20,7 @@ This dotfiles repository provides a modern, productive, and visually appealing d
 The install script backs up existing configuration files, but read below before running it!
 Requirements:
 * git
-* brew (on MacOS)
-* zsh 5.0.5 minimum (otherwise spaceship/starship themes may not recognize some colors)
+* [brew](https://brew.sh/) (on MacOS)
 
 ### Install
 ```
@@ -48,12 +47,6 @@ Update the spark-shell path in dotfiles/vim/ftplugin/python.vim.symlink & dotfil
 - Installs Hiddenbar and Stats (MacOS)
 - Installs LazyVim (clones https://github.com/LazyVim/starter to ~/.config/nvim, removes .git folder)
 - Sets default shell to zsh
-
-After running install.sh, start Neovim with:
-```
-nvim
-```
-Refer to the comments in the LazyVim config files for customization instructions.
 
 ### install_sketchybar.sh
 - Installs Sketchybar and its dependencies (sf-symbols, jq, gh)
