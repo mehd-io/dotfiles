@@ -30,11 +30,6 @@ cd ~/.dotfiles
 ./install_sketchybar.sh   # Installs Sketchybar and dependencies, sets up config
 ./install_aerospace.sh    # Installs Aerospace and sets up config
 ```
-Update the spark-shell path in dotfiles/vim/ftplugin/python.vim.symlink & dotfiles/vim/ftplugin/scala.vim.symlink if needed.
-
-### Terminal configuration: color & fonts
-* Fonts used: "DejaVu Sans Mono for Powerline.ttf" and  "Inconsolata for Powerline.otf" are in terminal/fonts folder
-* Colors used: "FrontEndDelight" are in terminal/colors folder (iterm2). For more colors or other terminal support, check: https://github.com/mbadolato/iTerm2-Color-Schemes
 
 ## What each install script does
 
