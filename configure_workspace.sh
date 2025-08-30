@@ -1,6 +1,6 @@
 #Create folder structure
 mkdir -p ~/.warp
-mkdir -p ~/.config/powerlevel10k
+mkdir -p ~/powerlevel10k
 mkdir -p ~/.config/aerospace
 mkdir -p ~/.config/catppuccin
 mkdir -p ~/.config/sketchybar
