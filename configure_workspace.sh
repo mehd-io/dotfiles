@@ -1,5 +1,5 @@
 #Create folder structure
-mkdir -p ~/.config/.config/.warp
+mkdir -p ~/.warp
 mkdir -p ~/.config/powerlevel10k
 mkdir -p ~/.config/aerospace
 mkdir -p ~/.config/catppuccin
@@ -8,16 +8,16 @@ mkdir -p ~/.config/borders
 mkdir -p ~/.config/aerospace
 
 #Create symbolic links
-ln -sf ~/Dropbox/devArturo/repos/dev/dotfiles/warp/* ~/.warp
-ln -sf ~/Dropbox/devArturo/repos/dev/dotfiles/starship/starship.toml ~/.config/starship.toml
-ln -sf ~/Dropbox/devArturo/repos/dev/dotfiles/powerlevel10k/* ~/powerlevel10k
-ln -sf ~/Dropbox/devArturo/repos/dev/dotfiles/zsh/.zshrc ~/.zshrc
-ln -sf ~/Dropbox/devArturo/repos/dev/dotfiles/aerospace/* ~/.config/aerospace
-ln -sf ~/Dropbox/devArturo/repos/dev/dotfiles/catppuccin/* ~/.config/catppuccin/
-ln -sf ~/Dropbox/devArturo/repos/dev/dotfiles/sketchybar/* ~/.config/sketchybar/
-ln -sf ~/Dropbox/devArturo/repos/dev/dotfiles/borders/*  ~/.config/borders
+ln -sf warp/* ~/.warp
+ln -sf starship/starship.toml ~/.config/starship.toml
+ln -sf powerlevel10k/* ~/powerlevel10k
+ln -sf zsh/.zshrc ~/.zshrc
+ln -sf aerospace/* ~/.config/aerospace
+ln -sf catppuccin/* ~/.config/catppuccin/
+ln -sf sketchybar/* ~/.config/sketchybar/
+ln -sf borders/*  ~/.config/borders
 
-#Grant executable rights
+#Grant
 chmod +x aerospace/organize-workspaces.sh
 chmod +x configure_workspace.sh
 chmod +x powerlevel10k/gitstatus/gitstatus.plugin.sh
