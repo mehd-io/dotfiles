@@ -118,6 +118,48 @@ echo "Sourcing .zshrc..."
 # You may need to open a new terminal for changes to take effect
 source ~/.zshrc 2>/dev/null || echo "  Note: Please open a new terminal for .zshrc changes to take effect"
 
+# Install fonts from fonts/fonts.sh
+echo "Installing required fonts..."
+if command -v brew &> /dev/null; then
+    # Source the font configuration to know which fonts are needed
+    if [ -f "$DOTFILES_DIR/fonts/fonts.sh" ]; then
+        source "$DOTFILES_DIR/fonts/fonts.sh"
+        echo "  Found font configuration file"
+        
+        # Install Homebrew tap for fonts
+        echo "  Adding homebrew-cask-fonts tap..."
+        brew tap homebrew/cask-fonts 2>/dev/null || true
+        
+        # Install JetBrainsMono Nerd Font
+        echo "  Installing JetBrainsMono Nerd Font..."
+        brew install --cask font-jetbrains-mono-nerd-font 2>/dev/null || echo "    JetBrainsMono Nerd Font might already be installed"
+        
+        # Install Hack Nerd Font
+        echo "  Installing Hack Nerd Font..."
+        brew install --cask font-hack-nerd-font 2>/dev/null || echo "    Hack Nerd Font might already be installed"
+        
+        # SF Pro is included with macOS, no need to install
+        echo "  SF Pro font is included with macOS"
+        
+        # Install sketchybar-app-font if available
+        echo "  Installing sketchybar-app-font..."
+        # This font is typically installed as part of sketchybar setup
+        if [ -d "$DOTFILES_DIR/sketchybar" ]; then
+            # Check if there's a specific font file or installation script
+            if [ -f "$DOTFILES_DIR/sketchybar/install_font.sh" ]; then
+                bash "$DOTFILES_DIR/sketchybar/install_font.sh" 2>/dev/null || echo "    sketchybar-app-font installation script not found"
+            else
+                echo "    sketchybar-app-font will be configured with sketchybar"
+            fi
+        fi
+        
+        echo "  ✓ Font installation complete"
+    else
+        echo "  Warning: fonts/fonts.sh not found, skipping font installation"
+    fi
+else
+    echo "  Homebrew not found. Please install Homebrew first to install fonts."
+fi
 
 # Install services (check if brew is available)
 echo "Installing services with Homebrew..."
