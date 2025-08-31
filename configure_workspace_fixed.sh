@@ -1,0 +1,182 @@
+#!/bin/bash
+
+# Exit on error
+set -e
+
+echo "Starting workspace configuration..."
+
+# Create folder structure
+echo "Creating folder structure..."
+mkdir -p ~/.config/warp
+mkdir -p ~/.config/powerlevel10k
+mkdir -p ~/.config/aerospace
+mkdir -p ~/.config/catppuccin
+mkdir -p ~/.config/sketchybar
+mkdir -p ~/.config/borders
+
+# Create symbolic links
+echo "Creating symbolic links..."
+
+# Remove any existing broken symlinks first
+[ -L ~/.warp ] && rm ~/.warp
+[ -L ~/.config/starship.toml ] && rm ~/.config/starship.toml
+[ -L ~/powerlevel10k ] && rm ~/powerlevel10k
+[ -L ~/.zshrc ] && rm ~/.zshrc
+
+# Get the current dotfiles directory
+DOTFILES_DIR="$PWD"
+
+# Create new symbolic links from current dotfiles directory
+if [ -d "$DOTFILES_DIR/warp" ]; then
+    ln -sf "$DOTFILES_DIR/warp" ~/.config/warp
+    echo "  ✓ Linked warp config"
+fi
+
+if [ -f "$DOTFILES_DIR/starship/starship.toml" ]; then
+    ln -sf "$DOTFILES_DIR/starship/starship.toml" ~/.config/starship.toml
+    echo "  ✓ Linked starship config"
+fi
+
+if [ -d "$DOTFILES_DIR/powerlevel10k" ]; then
+    ln -sf "$DOTFILES_DIR/powerlevel10k" ~/powerlevel10k
+    echo "  ✓ Linked powerlevel10k"
+fi
+
+if [ -f "$DOTFILES_DIR/zsh/.zshrc" ]; then
+    ln -sf "$DOTFILES_DIR/zsh/.zshrc" ~/.zshrc
+    echo "  ✓ Linked .zshrc"
+elif [ -f "$DOTFILES_DIR/.zshrc" ]; then
+    ln -sf "$DOTFILES_DIR/.zshrc" ~/.zshrc
+    echo "  ✓ Linked .zshrc"
+fi
+
+if [ -d "$DOTFILES_DIR/aerospace" ]; then
+    for file in "$DOTFILES_DIR/aerospace"/*; do
+        if [ -e "$file" ]; then
+            ln -sf "$file" ~/.config/aerospace/
+        fi
+    done
+    echo "  ✓ Linked aerospace configs"
+fi
+
+if [ -d "$DOTFILES_DIR/catppuccin" ]; then
+    for file in "$DOTFILES_DIR/catppuccin"/*; do
+        if [ -e "$file" ]; then
+            ln -sf "$file" ~/.config/catppuccin/
+        fi
+    done
+    echo "  ✓ Linked catppuccin configs"
+fi
+
+if [ -d "$DOTFILES_DIR/sketchybar" ]; then
+    for file in "$DOTFILES_DIR/sketchybar"/*; do
+        if [ -e "$file" ]; then
+            ln -sf "$file" ~/.config/sketchybar/
+        fi
+    done
+    echo "  ✓ Linked sketchybar configs"
+fi
+
+if [ -d "$DOTFILES_DIR/borders" ]; then
+    for file in "$DOTFILES_DIR/borders"/*; do
+        if [ -e "$file" ]; then
+            ln -sf "$file" ~/.config/borders/
+        fi
+    done
+    echo "  ✓ Linked borders configs"
+fi
+
+# Grant executable rights
+echo "Setting executable permissions..."
+[ -f aerospace/organize-workspaces.sh ] && chmod +x aerospace/organize-workspaces.sh
+chmod +x configure_workspace.sh 2>/dev/null || true
+chmod +x configure_workspace_fixed.sh 2>/dev/null || true
+[ -f powerlevel10k/gitstatus/gitstatus.plugin.sh ] && chmod +x powerlevel10k/gitstatus/gitstatus.plugin.sh
+[ -f powerlevel10k/gitstatus/gitstatus.prompt.sh ] && chmod +x powerlevel10k/gitstatus/gitstatus.prompt.sh
+[ -f sketchybar/items/front_app.sh ] && chmod +x sketchybar/items/front_app.sh
+[ -f sketchybar/plugins/aerospace.sh ] && chmod +x sketchybar/plugins/aerospace.sh
+[ -f sketchybar/plugins/battery.sh ] && chmod +x sketchybar/plugins/battery.sh
+[ -f sketchybar/plugins/clock.sh ] && chmod +x sketchybar/plugins/clock.sh
+[ -f sketchybar/plugins/front_app.sh ] && chmod +x sketchybar/plugins/front_app.sh
+[ -f sketchybar/plugins/icon_map_fn.sh ] && chmod +x sketchybar/plugins/icon_map_fn.sh
+[ -f sketchybar/plugins/load_spaces.sh ] && chmod +x sketchybar/plugins/load_spaces.sh
+[ -f sketchybar/plugins/neutonfoo_battery.sh ] && chmod +x sketchybar/plugins/neutonfoo_battery.sh
+[ -f sketchybar/plugins/neutonfoo_clock.sh ] && chmod +x sketchybar/plugins/neutonfoo_clock.sh
+[ -f sketchybar/plugins/neutonfoo_volume.sh ] && chmod +x sketchybar/plugins/neutonfoo_volume.sh
+[ -f sketchybar/plugins/reinit_workspaces.sh ] && chmod +x sketchybar/plugins/reinit_workspaces.sh
+[ -f sketchybar/plugins/space.sh ] && chmod +x sketchybar/plugins/space.sh
+[ -f sketchybar/plugins/space_windows.sh ] && chmod +x sketchybar/plugins/space_windows.sh
+[ -f sketchybar/plugins/spotify.sh ] && chmod +x sketchybar/plugins/spotify.sh
+[ -f sketchybar/plugins/update_workspace_icons.sh ] && chmod +x sketchybar/plugins/update_workspace_icons.sh
+[ -f sketchybar/plugins/volume.sh ] && chmod +x sketchybar/plugins/volume.sh
+[ -f sketchybar/plugins/weather.sh ] && chmod +x sketchybar/plugins/weather.sh
+[ -f sketchybar/plugins/workspace_monitor.sh ] && chmod +x sketchybar/plugins/workspace_monitor.sh
+
+# Source Zsh terminal (only if it exists)
+echo "Sourcing .zshrc..."
+# Note: sourcing might not work as expected in a bash script
+# You may need to open a new terminal for changes to take effect
+source ~/.zshrc 2>/dev/null || echo "  Note: Please open a new terminal for .zshrc changes to take effect"
+
+
+# Install services (check if brew is available)
+echo "Installing services with Homebrew..."
+read -p "Do you want to install the services (borders, sketchybar, aerospace)? [y/N] " -n 1 -r
+echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        brew tap FelixKratz/formulae
+        brew install borders || echo "  borders might already be installed"
+        brew install sketchybar || echo "  sketchybar might already be installed"
+        brew install --cask nikitabobko/tap/aerospace || echo "  aerospace might already be installed"
+    fi
+
+
+# Start services (only if installed)
+echo "Starting services..."
+if [ -d "/Applications/AeroSpace.app" ]; then
+    echo "  Starting AeroSpace..."
+    open -a AeroSpace 2>/dev/null || true
+    sleep 2
+    command -v aerospace &> /dev/null && aerospace enable on
+fi
+
+if command -v borders &> /dev/null; then
+    echo "  Starting borders..."
+    # Kill existing borders process if running
+    pkill borders 2>/dev/null || true
+    borders &
+    if command -v brew &> /dev/null; then
+        brew services start borders 2>/dev/null || true
+    fi
+fi
+
+if command -v sketchybar &> /dev/null; then
+    echo "  Starting sketchybar..."
+    if command -v brew &> /dev/null; then
+        brew services start sketchybar 2>/dev/null || true
+    fi
+fi
+
+# Reload configs (only if services are running)
+echo "Reloading configurations..."
+if command -v brew &> /dev/null; then
+    if brew services list 2>/dev/null | grep -q "borders.*started"; then
+        brew services restart borders
+        echo "  ✓ Restarted borders"
+    fi
+fi
+
+if command -v aerospace &> /dev/null; then
+    aerospace reload-config 2>/dev/null && echo "  ✓ Reloaded aerospace config"
+fi
+
+if command -v sketchybar &> /dev/null; then
+    sketchybar --reload 2>/dev/null && echo "  ✓ Reloaded sketchybar"
+fi
+
+echo "Workspace configuration complete!"
+echo ""
+echo "Note: If any symbolic links failed, make sure the source files exist in:"
+echo "  $DOTFILES_DIR"
+echo ""
+echo "You may need to open a new terminal for all changes to take effect."
