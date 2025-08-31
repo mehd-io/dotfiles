@@ -3,6 +3,9 @@
 # Load Catppuccin colors
 source "$HOME/.config/catppuccin/catppuccin-mocha.sh"
 
+# Load font configurations
+source "$HOME/.config/fonts/fonts.sh"
+
 # Max number of characters so it fits nicely to the right of the notch
 # MAY NOT WORK WITH NON-ENGLISH CHARACTERS
 
@@ -51,7 +54,7 @@ update_track() {
         fi
         sketchybar --set $NAME label="${TRACK}  ${ARTIST}" \
             label.drawing=yes \
-            label.font="JetBrainsMono Nerd Font:Medium:12.0" \
+            label.font="$FONT_JETBRAINS_MEDIUM_12" \
             icon.color=$CAT_GREEN
 #           background.color=0xffa6da95 \
 

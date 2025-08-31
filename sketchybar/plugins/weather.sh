@@ -1,5 +1,8 @@
 #!/usr/bin/env zsh
 
+# Load font configurations
+source "$HOME/.config/fonts/fonts.sh"
+
 IP=$(curl -s https://ipinfo.io/ip)
 LOCATION_JSON=$(curl -s https://ipinfo.io/$IP/json)
 
@@ -52,5 +55,5 @@ case ${MOON_PHASE} in
 esac
     
 sketchybar --set $NAME label="$LOCATION  $TEMPERATURE℃ $WEATHER_DESCRIPTION" \
-                       label.font="JetBrainsMono Nerd Font:Medium:12.0"
+                       label.font="$FONT_JETBRAINS_MEDIUM_12"
 sketchybar --set $NAME.moon icon=$ICON

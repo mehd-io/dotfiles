@@ -1,7 +1,10 @@
 #!/bin/sh
 
+# Load font configurations
+source "$HOME/.config/fonts/fonts.sh"
+
 front_app=(
-  label.font="$FONT:Black:12.0"
+  label.font="$FONT_JETBRAINS_BLACK_12"
   icon.background.drawing=on
   display=active
   script="$PLUGIN_DIR/front_app.sh"

@@ -4,9 +4,11 @@
 # Load Catppuccin colors
 source "$HOME/.config/catppuccin/catppuccin-mocha.sh"
 
+# Load font configurations
+source "$HOME/.config/fonts/fonts.sh"
+
 PLUGIN_DIR="$CONFIG_DIR/plugins"
 ITEM_DIR="$CONFIG_DIR/items"
-FONT_FACE="JetBrainsMono Nerd Font"
 SPOTIFY_EVENT="com.spotify.client.PlaybackStateChanged"
 ##### Bar Appearance #####
 # Configuring the general appearance of the bar.
@@ -25,8 +27,8 @@ sketchybar --bar position=bottom height=40 blur_radius=30 color=$CAT_BASE_TRANSP
 default=(
   padding_left=5
   padding_right=5
-  icon.font="Hack Nerd Font:Bold:17.0"
-  label.font="SF Pro:Semibold:17.0"
+  icon.font="$FONT_HACK_BOLD_17"
+  label.font="$FONT_SF_PRO_SEMIBOLD_17"
   icon.color=$CAT_TEXT
   label.color=$CAT_TEXT
   icon.padding_left=4
@@ -84,7 +86,7 @@ init_workspaces() {
       icon.padding_left=10 \
       icon.shadow.distance=4 \
       icon.shadow.color=$CAT_CRUST \
-      label.font="sketchybar-app-font:Regular:16.0" \
+      label.font="$FONT_SKETCHYBAR_APP_16" \
       label.padding_right=20 \
       label.padding_left=0 \
       label.y_offset=-1 \
@@ -147,7 +149,7 @@ sketchybar --add item clock right \
   --subscribe battery system_woke power_source_change \
   --add item swap e \
   icon="" \
-  label.font="Hack Nerd Font:Italic:13.0" \
+  label.font="$FONT_HACK_ITALIC_13" \
   icon.color=$CAT_SUBTEXT0 \
   label.color=$CAT_SUBTEXT0
 
@@ -157,7 +159,7 @@ sketchybar --add event spotify_change $SPOTIFY_EVENT \
     display=2 \
     icon= \
     icon.y_offset=1 \
-    icon.font="$FONT_FACE:Bold:20.0" \
+    icon.font="$FONT_JETBRAINS_BOLD_20" \
     label.drawing=off \
     label.padding_left=3 \
     script="$PLUGIN_DIR/spotify.sh" \
@@ -169,7 +171,7 @@ sketchybar --add item weather.moon right \
 #    background.color=0x667dc4e4 \
     background.padding_right=-1 \
     icon.color=$CAT_CRUST \
-    icon.font="$FONT_FACE:Bold:22.0" \
+    icon.font="$FONT_JETBRAINS_BOLD_22" \
     icon.padding_left=4 \
     icon.padding_right=3 \
     label.drawing=off \
@@ -180,7 +182,7 @@ sketchybar --add item weather right \
     display=2 \
     icon= \
     icon.color=$CAT_PINK \
-    icon.font="$FONT_FACE:Bold:15.0" \
+    icon.font="$FONT_JETBRAINS_BOLD_15" \
     update_freq=1800 \
     script="$PLUGIN_DIR/weather.sh" \
     --subscribe weather system_woke

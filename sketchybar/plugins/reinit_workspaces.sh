@@ -3,6 +3,9 @@
 # Source Catppuccin colors
 source "$HOME/.config/catppuccin/catppuccin-mocha.sh"
 
+# Load font configurations
+source "$HOME/.config/fonts/fonts.sh"
+
 CONFIG_DIR="$HOME/.config/sketchybar"
 
 # Function to initialize workspace items
@@ -48,7 +51,7 @@ reinit_workspaces() {
       icon.padding_left=10 \
       icon.shadow.distance=4 \
       icon.shadow.color=$CAT_CRUST \
-      label.font="sketchybar-app-font:Regular:16.0" \
+      label.font="$FONT_SKETCHYBAR_APP_16" \
       label.padding_right=20 \
       label.padding_left=0 \
       label.y_offset=-1 \
