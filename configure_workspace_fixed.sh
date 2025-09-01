@@ -185,12 +185,10 @@ echo
 # Start services (only if installed)
 echo "Starting services..."
 if [ -d "/Applications/AeroSpace.app" ]; then
-    echo "  Starting AeroSpace..."
-    open -a AeroSpace 2>/dev/null || true
-    sleep 2
-    
     # Check if aerospace command is available and try to enable it
     if command -v aerospace &> /dev/null; then
+#        open -a AeroSpace 2>/dev/null || true
+        sleep 2
         # Try to enable aerospace, check for accessibility permission error
         if ! aerospace enable on 2>&1 | tee /tmp/aerospace_output.txt | grep -q "Can't connect to AeroSpace server"; then
             echo "    ✓ AeroSpace enabled successfully"
