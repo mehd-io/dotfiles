@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 
 # Exit on error
 set -e
@@ -7,13 +7,13 @@ echo "Starting workspace configuration..."
 
 # Create folder structure
 echo "Creating folder structure..."
-mkdir -p ~/.config/warp
-mkdir -p ~/.config/powerlevel10k
+mkdir -p ~/.warp
+mkdir -p ~/.warp/themes
+mkdir -p ~/powerlevel10k
 mkdir -p ~/.config/aerospace
 mkdir -p ~/.config/catppuccin
 mkdir -p ~/.config/sketchybar
 mkdir -p ~/.config/borders
-mkdir -p ~/.config/fonts
 
 # Create symbolic links
 echo "Creating symbolic links..."
@@ -29,7 +29,7 @@ DOTFILES_DIR="$PWD"
 
 # Create new symbolic links from current dotfiles directory
 if [ -d "$DOTFILES_DIR/warp" ]; then
-    ln -sf "$DOTFILES_DIR/warp" ~/.config/warp
+    ln -sf "$DOTFILES_DIR/warp/themes"/* ~/.warp/themes
     echo "  ✓ Linked warp config"
 fi
 
@@ -121,12 +121,6 @@ chmod +x configure_workspace_fixed.sh 2>/dev/null || true
 [ -f sketchybar/plugins/weather.sh ] && chmod +x sketchybar/plugins/weather.sh
 [ -f sketchybar/plugins/workspace_monitor.sh ] && chmod +x sketchybar/plugins/workspace_monitor.sh
 
-# Source Zsh terminal (only if it exists)
-echo "Sourcing .zshrc..."
-# Note: sourcing might not work as expected in a bash script
-# You may need to open a new terminal for changes to take effect
-source ~/.zshrc 2>/dev/null || echo "  Note: Please open a new terminal for .zshrc changes to take effect"
-
 # Install fonts from fonts/fonts.sh
 echo "Installing required fonts..."
 if command -v brew &> /dev/null; then
@@ -176,9 +170,11 @@ fi
 
 # Install services (check if brew is available)
 echo "Installing services with Homebrew..."
-read -p "Do you want to install the services (borders, sketchybar, aerospace)? [y/N] " -n 1 -r
+echo -n "Do you want to install the services (borders, sketchybar, aerospace)? [y/N] "
+read -k 1 -r REPLY
 echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
+        brew install starship
         brew tap FelixKratz/formulae
         brew install borders || echo "  borders might already be installed"
         brew install sketchybar || echo "  sketchybar might already be installed"
@@ -241,12 +237,11 @@ fi
 
 # Reload configs (only if services are running)
 echo "Reloading configurations..."
-brew services restart borders
-echo "  ✓ Restarted borders"
+brew services restart borders && echo "  ✓ Restarted borders"
 aerospace reload-config 2>/dev/null && echo "  ✓ Reloaded aerospace config"
 sketchybar --reload 2>/dev/null && echo "  ✓ Reloaded sketchybar"
 open -a AeroSpace && echo "  ✓ Reloaded AeroSpace"
-
+echo "Sourcing .zshrc..." && source ~/.zshrc
 echo "Workspace configuration complete!"
 echo ""
 echo "Note: If any symbolic links failed, make sure the source files exist in:"
