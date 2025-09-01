@@ -1,6 +1,9 @@
 # A simple sketchybar config for aerospace users to get started with
 # Not too different from the base starting config!
 
+# Set CONFIG_DIR to the sketchybar config directory
+CONFIG_DIR="$HOME/.config/sketchybar"
+
 # Load Catppuccin colors
 source "$HOME/.config/catppuccin/catppuccin-mocha.sh"
 

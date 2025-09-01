@@ -6,6 +6,7 @@ mkdir -p ~/.config/catppuccin
 mkdir -p ~/.config/sketchybar
 mkdir -p ~/.config/borders
 mkdir -p ~/.config/aerospace
+mkdir -p ~/.config/fonts
 
 #Create symbolic links
 ln -sf warp/* ~/.warp
@@ -14,6 +15,7 @@ ln -sf powerlevel10k/* ~/powerlevel10k
 ln -sf zsh/.zshrc ~/.zshrc
 ln -sf aerospace/* ~/.config/aerospace
 ln -sf catppuccin/* ~/.config/catppuccin/
+ln -sf fonts/* ~/.config/fonts/
 ln -sf sketchybar/* ~/.config/sketchybar/
 ln -sf borders/*  ~/.config/borders
 

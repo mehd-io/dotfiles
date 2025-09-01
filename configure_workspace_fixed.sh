@@ -13,6 +13,7 @@ mkdir -p ~/.config/aerospace
 mkdir -p ~/.config/catppuccin
 mkdir -p ~/.config/sketchybar
 mkdir -p ~/.config/borders
+mkdir -p ~/.config/fonts
 
 # Create symbolic links
 echo "Creating symbolic links..."
@@ -66,6 +67,14 @@ if [ -d "$DOTFILES_DIR/catppuccin" ]; then
         fi
     done
     echo "  ✓ Linked catppuccin configs"
+fi
+
+if [ -d "$DOTFILES_DIR/fonts" ]; then
+    # Remove existing symlink or directory if it exists
+    [ -L ~/.config/fonts ] && rm ~/.config/fonts
+    [ -d ~/.config/fonts ] && rm -rf ~/.config/fonts
+    ln -sf "$DOTFILES_DIR/fonts" ~/.config/fonts
+    echo "  ✓ Linked fonts config"
 fi
 
 if [ -d "$DOTFILES_DIR/sketchybar" ]; then
@@ -141,16 +150,20 @@ if command -v brew &> /dev/null; then
         # SF Pro is included with macOS, no need to install
         echo "  SF Pro font is included with macOS"
         
-        # Install sketchybar-app-font if available
+        # Install sketchybar-app-font (essential for app icons)
         echo "  Installing sketchybar-app-font..."
-        # This font is typically installed as part of sketchybar setup
-        if [ -d "$DOTFILES_DIR/sketchybar" ]; then
-            # Check if there's a specific font file or installation script
-            if [ -f "$DOTFILES_DIR/sketchybar/install_font.sh" ]; then
-                bash "$DOTFILES_DIR/sketchybar/install_font.sh" 2>/dev/null || echo "    sketchybar-app-font installation script not found"
+        # Download and install the sketchybar-app-font
+        if ! ls ~/Library/Fonts/sketchybar-app-font.ttf &>/dev/null; then
+            echo "    Downloading sketchybar-app-font..."
+            curl -L https://github.com/kvndrsslr/sketchybar-app-font/releases/latest/download/sketchybar-app-font.ttf -o /tmp/sketchybar-app-font.ttf 2>/dev/null
+            if [ -f "/tmp/sketchybar-app-font.ttf" ]; then
+                mv /tmp/sketchybar-app-font.ttf ~/Library/Fonts/
+                echo "    ✓ sketchybar-app-font installed successfully"
             else
-                echo "    sketchybar-app-font will be configured with sketchybar"
+                echo "    ⚠️  Failed to download sketchybar-app-font"
             fi
+        else
+            echo "    sketchybar-app-font already installed"
         fi
         
         echo "  ✓ Font installation complete"
@@ -179,7 +192,34 @@ if [ -d "/Applications/AeroSpace.app" ]; then
     echo "  Starting AeroSpace..."
     open -a AeroSpace 2>/dev/null || true
     sleep 2
-    command -v aerospace &> /dev/null && aerospace enable on
+    
+    # Check if aerospace command is available and try to enable it
+    if command -v aerospace &> /dev/null; then
+        # Try to enable aerospace, check for accessibility permission error
+        if ! aerospace enable on 2>&1 | tee /tmp/aerospace_output.txt | grep -q "Can't connect to AeroSpace server"; then
+            echo "    ✓ AeroSpace enabled successfully"
+        else
+            echo "  Starting AeroSpace..."
+            open -a AeroSpace 2>/dev/null || true
+            sleep 2
+            echo "    ⚠️  AeroSpace needs accessibility permissions!"
+            echo "    Opening System Settings - Privacy & Security - Accessibility..."
+            echo "    Please enable AeroSpace in the Accessibility settings."
+            echo ""
+            
+            # Open System Settings at the Accessibility pane
+            open "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
+            
+            # Wait for user to grant permissions
+            echo "    Press Enter after you have enabled AeroSpace in Accessibility settings..."
+            read -r
+            
+            # Try to enable aerospace again after permissions granted
+            echo "    Attempting to enable AeroSpace again..."
+            aerospace enable on 2>/dev/null || echo "    ⚠️  If AeroSpace still fails, try restarting AeroSpace.app"
+        fi
+        rm -f /tmp/aerospace_output.txt 2>/dev/null
+    fi
 fi
 
 if command -v borders &> /dev/null; then
