@@ -241,20 +241,11 @@ fi
 
 # Reload configs (only if services are running)
 echo "Reloading configurations..."
-if command -v brew &> /dev/null; then
-    if brew services list 2>/dev/null | grep -q "borders.*started"; then
-        brew services restart borders
-        echo "  ✓ Restarted borders"
-    fi
-fi
-
-if command -v aerospace &> /dev/null; then
-    aerospace reload-config 2>/dev/null && echo "  ✓ Reloaded aerospace config"
-fi
-
-if command -v sketchybar &> /dev/null; then
-    sketchybar --reload 2>/dev/null && echo "  ✓ Reloaded sketchybar"
-fi
+brew services restart borders
+echo "  ✓ Restarted borders"
+aerospace reload-config 2>/dev/null && echo "  ✓ Reloaded aerospace config"
+sketchybar --reload 2>/dev/null && echo "  ✓ Reloaded sketchybar"
+open -a AeroSpace && echo "  ✓ Reloaded AeroSpace"
 
 echo "Workspace configuration complete!"
 echo ""
