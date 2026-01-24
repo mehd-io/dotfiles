@@ -2,65 +2,195 @@
 
 This dotfiles repository provides a modern, productive, and visually appealing development environment for macOS. It brings together:
 
-- [**aerospace**](https://github.com/nikitabobko/AeroSpace) an i3-like tiling window manager for macOS
-- **Sketchybar** (macOS) for a highly customizable status bar, and **Aerospace** for advanced window management.
-- **Zsh** as the main shell, with [Starship](https://starship.rs/) prompt using the [Pastel Powerline preset](https://starship.rs/presets/#pastel-powerline) for a fast, informative, and beautiful command line experience.
-- **Tmux** for terminal multiplexing, session management, and efficient workflows.
-- **Neovim & LazyVim** as a pre-configured, extensible Neovim setup for powerful code editing.
-- **Ghostty** as the terminal emulator (macOS), with custom themes and settings.
-- **Hiddenbar** and **Stats** (macOS) for menu bar and system monitoring enhancements.
-- Sensible defaults, backup and symlink management, and easy setup for new machines.
+- [**Aerospace**](https://github.com/nikitabobko/AeroSpace) — i3-like tiling window manager for macOS
+- [**Sketchybar**](https://github.com/FelixKratz/SketchyBar) — highly customizable status bar for macOS
+- [**Zsh**](https://www.zsh.org/) — main shell with [Starship](https://starship.rs/) prompt using the [Pastel Powerline preset](https://starship.rs/presets/#pastel-powerline)
+- [**Atuin**](https://docs.atuin.sh/) — magical shell history with sync across machines
+- [**Tmux**](https://github.com/tmux/tmux) — terminal multiplexing and session management
+- [**Neovim**](https://neovim.io/) with [**LazyVim**](https://www.lazyvim.org/) — pre-configured, extensible code editing
+- [**Ghostty**](https://ghostty.org/) — fast, native terminal emulator
+- [**Hiddenbar**](https://github.com/dwarvesf/hidden) and [**Stats**](https://github.com/exelban/stats) — menu bar and system monitoring
 
 ![Terminal and status bar setup](docs/screenshot.png)
 *Example: Starship prompt (Pastel Powerline), Ghostty terminal, and Sketchybar on macOS.*
 
+---
+
+## Table of Contents
+
+- [Getting Started](#getting-started)
+- [What Each Install Script Does](#what-each-install-script-does)
+- [My Mac Setup](#my-mac-setup)
+- [About Aerospace](#about-aerospace)
+- [Starship Prompt](#starship-prompt--pastel-powerline)
+- [Tmux](#tmux)
+
+---
+
 ## Getting Started
 
-### Prerequisite
+### Prerequisites
+
 The install script backs up existing configuration files, but read below before running it!
-Requirements:
-* git
-* [brew](https://brew.sh/) (on MacOS)
+
+**Requirements:**
+- [Git](https://git-scm.com/)
+- [Homebrew](https://brew.sh/) (macOS package manager)
+
+```bash
+# Install Homebrew if not already installed
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
 
 ### Install
-```
+
+```bash
 git clone https://github.com/mehd-io/dotfiles ~/.dotfiles
 cd ~/.dotfiles
-./install.sh         # Installs core tools, symlinks configs, sets up Ghostty & Starship, Hiddenbar, Stats, and LazyVim
-./install_sketchybar.sh   # Installs Sketchybar and dependencies, sets up config
-./install_aerospace.sh    # Installs Aerospace and sets up config
+./install.sh              # Core tools, symlinks, Ghostty, Starship, Hiddenbar, Stats, LazyVim, Atuin
+./install_sketchybar.sh   # Sketchybar and dependencies
+./install_aerospace.sh    # Aerospace window manager
 ```
 
-## What each install script does
+### Post-Install
+
+After installation, you may want to:
+1. **Restart your terminal** to apply all shell changes
+2. **Log out and back in** for Aerospace to take effect
+3. **Configure Atuin** by running `atuin login` to sync shell history across machines
+
+---
+
+## What Each Install Script Does
 
 ### install.sh
-- Installs required packages depending on OS (neovim, tmux, tree, wget, zsh, curl, starship, etc.)
-- Symlinks tmux.conf, .zshrc, .zprofile, and other dotfiles
-- Symlinks Ghostty config to ~/.config/ghostty/config
-- Symlinks Starship config (Pastel Powerline preset) to ~/.config/starship.toml
-- Installs Ghostty terminal (MacOS)
-- Installs Hiddenbar and Stats (MacOS)
-- Installs LazyVim (clones https://github.com/LazyVim/starter to ~/.config/nvim, removes .git folder)
-- Sets default shell to zsh
+
+- Installs packages via Homebrew: neovim, tmux, tree, wget, zsh, curl, starship, atuin
+- Symlinks configuration files:
+  - `~/.zshrc`, `~/.zprofile` (Zsh)
+  - `~/.tmux.conf`, `~/.tmux.conf.local` (Tmux)
+  - `~/.config/ghostty/config` (Ghostty)
+  - `~/.config/starship.toml` (Starship)
+  - `~/.config/atuin/config.toml` (Atuin)
+  - `~/.config/borders/bordersrc` (Borders)
+- Installs macOS apps via Homebrew Cask: Ghostty, Hiddenbar, Stats
+- Installs [LazyVim](https://www.lazyvim.org/) (Neovim starter config)
+- Sets Zsh as default shell
 
 ### install_sketchybar.sh
-- Installs Sketchybar and its dependencies (sf-symbols, jq, gh)
+
+- Installs [Sketchybar](https://github.com/FelixKratz/SketchyBar) and dependencies (sf-symbols, jq, gh)
 - Downloads and installs the Sketchybar app font
-- Backs up existing Sketchybar config and moves new config into place
+- Backs up existing config and symlinks new config
 - Restarts Sketchybar service
 
 ### install_aerospace.sh
-- Installs Aerospace (MacOS window manager)
-- Backs up existing Aerospace config and moves new config into place
 
-## About Aerospace 
+- Installs [Aerospace](https://github.com/nikitabobko/AeroSpace) window manager
+- Backs up existing config and symlinks new config
 
-I did a video for a deep dive on this tiling window manager, check this here : 
+---
+
+## My Mac Setup
+
+A comprehensive list of apps and tools I use for development and productivity.
+
+### Terminal & Shell
+
+| Tool | Description |
+|------|-------------|
+| [Ghostty](https://ghostty.org/) | Fast, native terminal emulator |
+| [Starship](https://starship.rs/) | Cross-shell prompt with Pastel Powerline theme |
+| [Atuin](https://docs.atuin.sh/) | Magical shell history with sync |
+| [Tmux](https://github.com/tmux/tmux) | Terminal multiplexer |
+| [Yazi](https://github.com/sxyazi/yazi) | Blazing fast terminal file manager |
+
+### Code Editors & IDEs
+
+| Tool | Description |
+|------|-------------|
+| [Cursor](https://cursor.sh/) | AI-powered code editor |
+| [Neovim](https://neovim.io/) + [LazyVim](https://www.lazyvim.org/) | Extensible text editor |
+
+### AI Tools
+
+| Tool | Description |
+|------|-------------|
+| [Claude Desktop](https://claude.ai/download) | Claude AI desktop app |
+| [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | AI coding assistant CLI |
+| [OpenCode](https://github.com/opencode-ai/opencode) | Open-source AI coding assistant |
+
+### Window Management & Menu Bar
+
+| Tool | Description |
+|------|-------------|
+| [Aerospace](https://github.com/nikitabobko/AeroSpace) | i3-like tiling window manager |
+| [Sketchybar](https://github.com/FelixKratz/SketchyBar) | Customizable status bar |
+| [Hiddenbar](https://github.com/dwarvesf/hidden) | Hide menu bar icons |
+| [Stats](https://github.com/exelban/stats) | System monitoring in menu bar |
+
+### Productivity
+
+| Tool | Description |
+|------|-------------|
+| [Raycast](https://www.raycast.com/) | Spotlight replacement with extensions |
+| [Obsidian](https://obsidian.md/) | Markdown-based knowledge base |
+| [Notion](https://www.notion.so/) | All-in-one workspace |
+| [1Password](https://1password.com/) | Password manager |
+| [Annotate](https://github.com/epilande/Annotate) | Screenshot annotation tool |
+
+### Development & DevOps
+
+| Tool | Description |
+|------|-------------|
+| [Homebrew](https://brew.sh/) | Package manager for macOS |
+| [OrbStack](https://orbstack.dev/) | Fast Docker & Linux on macOS |
+| [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-mac.html) | Amazon Web Services CLI |
+| [gcloud CLI](https://cloud.google.com/sdk/docs/install) | Google Cloud CLI |
+| [dua](https://github.com/Byron/dua-cli) | Disk usage analyzer |
+
+### Browsers
+
+| Tool | Description |
+|------|-------------|
+| [Brave](https://brave.com/) | Privacy-focused browser |
+| [Chrome](https://www.google.com/chrome/) | Google Chrome |
+| [Firefox](https://www.mozilla.org/firefox/) | Mozilla Firefox |
+
+### Media & Creative
+
+| Tool | Description |
+|------|-------------|
+| [Spotify](https://www.spotify.com/) | Music streaming |
+| [OBS](https://obsproject.com/) | Streaming and recording |
+| [Adobe Photoshop](https://www.adobe.com/products/photoshop.html) | Image editing |
+| [Adobe Premiere Pro](https://www.adobe.com/products/premiere.html) | Video editing |
+| [Ableton Live](https://www.ableton.com/) | Music production |
+
+### Utilities
+
+| Tool | Description |
+|------|-------------|
+| [Keka](https://www.keka.io/) | File archiver |
+| [Zoom](https://zoom.us/) | Video conferencing |
+
+---
+
+## About Aerospace
+
+I made a deep dive video on this tiling window manager:
+
 [![Aerospace Window Manager Deep Dive](https://img.youtube.com/vi/gjR2eiomRwo/0.jpg)](https://www.youtube.com/watch?v=gjR2eiomRwo)
 
-## Starship prompt : Pastel Powerline
+---
+
+## Starship Prompt : Pastel Powerline
+
 This setup uses [Starship](https://starship.rs/) with the [Pastel Powerline preset](https://starship.rs/presets/#pastel-powerline) for a modern, colorful, and informative shell prompt.
 
+---
+
 ## Tmux
-command key remapped from ctrl+b to ctrl+a
-Using theme from : https://github.com/gpakosz/.tmux
+
+- Command key remapped from `Ctrl+b` to `Ctrl+a`
+- Using theme from [gpakosz/.tmux](https://github.com/gpakosz/.tmux)
