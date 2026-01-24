@@ -2,3 +2,10 @@ autoload -U +X compinit && compinit
 autoload -U +X bashcompinit && bashcompinit
 eval "$(starship init zsh)"
 export PATH="$HOME/.local/bin:$PATH"
+eval "$(duckman completion zsh)"
+export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
+
+
+. "$HOME/.atuin/bin/env"
+
+eval "$(atuin init zsh)"

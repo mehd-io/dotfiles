@@ -1,0 +1,10 @@
+## Atuin configuration
+## Full reference: https://docs.atuin.sh/configuration/config/
+
+## Defaults to true. If enabled, upon hitting enter Atuin will immediately execute the command.
+## Press tab to return to the shell and edit.
+enter_accept = true
+
+[sync]
+# Enable sync v2 by default
+records = true

@@ -1,3 +1,7 @@
+alias v="nvim"
+export GEMINI_API_KEY=  # Set your Gemini API key here
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
 kubecfg () {
     declare -a kcfgs;
     ki=1;
@@ -42,7 +46,7 @@ aws-profile-switch () {
 # To fix
 aws-profile-keys () {
   grep -q -w "\[profile ${1}\]" ~/.aws/config || { echo "No such profile $1"; return 1; }
-  profile_data=$(cat ~/.aws/credentials | grep "\[$1\]" -A4) 
+  profile_data=$(cat ~/.aws/credentials | grep "\[$1\]" -A4)
   export AWS_ACCESS_KEY_ID="$(echo $profile_data | grep aws_access_key_id | cut -f2 -d'=' | tr -d ' ')"
   export AWS_SECRET_ACCESS_KEY="$(echo $profile_data | grep aws_secret_access_key | cut -f2 -d'=' | tr -d ' ')"
 }
@@ -62,8 +66,8 @@ gcp-project-ls () {
 
   for i in "${ACCOUNT[@]}";
   do
-    : 
-    echo "GCP projects for $i" 
+    :
+    echo "GCP projects for $i"
     gcloud config set account $i
     gcloud projects list
   done
@@ -91,3 +95,6 @@ if [ -z "$SSH_AUTH_SOCK" ]; then
    eval `cat $HOME/.ssh/ssh-agent`
 fi
 
+# Added by OrbStack: command-line tools and integration
+# This won't be added again if you remove it.
+source ~/.orbstack/shell/init.zsh 2>/dev/null || :

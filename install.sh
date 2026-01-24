@@ -25,7 +25,7 @@ for file in $linkables; do
 done
 
 # backup from .config
-folders_to_backup=("borders" "alacritty")
+folders_to_backup=("borders" "alacritty" "atuin")
 
 # Loop through each folder and back it up
 for folder in "${folders_to_backup[@]}"; do
@@ -52,6 +52,7 @@ package_to_install="neovim
     zsh
     curl
     starship
+    atuin
 "
  if cat /etc/*release | grep ^NAME | grep CentOS; then
     echo "==============================================="
@@ -120,6 +121,10 @@ ln -s -f $DOTFILES/ghostty/config $HOME/.config/ghostty/config
 
 # Symlink Starship config
 ln -s -f $DOTFILES/starship/starship.toml $HOME/.config/starship.toml
+
+# Symlink Atuin config
+mkdir -p $HOME/.config/atuin
+ln -s -f $DOTFILES/atuin/config.toml $HOME/.config/atuin/config.toml
 
 #default bash is zsh
 chsh -s /bin/zsh
