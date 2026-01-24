@@ -12,7 +12,7 @@ after-login-command = []
 after-startup-command = []
 
 # Start AeroSpace at login
-start-at-login = true 
+start-at-login = true
 
 # Normalizations. See: https://nikitabobko.github.io/AeroSpace/guide#normalization
 enable-normalization-flatten-containers = true
@@ -41,7 +41,7 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 # You can effectively turn off macOS "Hide application" (cmd-h) feature by toggling this flag
 # Useful if you don't use this macOS feature, but accidentally hit cmd-h or cmd-alt-h key
 # Also see: https://nikitabobko.github.io/AeroSpace/goodies#disable-hide-app
-automatically-unhide-macos-hidden-apps = true 
+automatically-unhide-macos-hidden-apps = true
 
 
 #ADDED STUFF
@@ -69,9 +69,9 @@ preset = 'qwerty'
 inner.horizontal = 8
 inner.vertical = 8
 outer.bottom = 5
-outer.top = [{ monitor.main = 10}, 10]
+outer.top = [{ monitor.main = 40}, 10]
 outer.right = 5
-outer.left = 5
+outer.left= 5
 
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
@@ -105,11 +105,12 @@ outer.left = 5
 
 # App shortcuts
 alt-b = 'exec-and-forget open -a /Applications/Brave\ Browser.app'
-alt-c = 'exec-and-forget open -a /Applications/Cursor.app'
+#alt-c = 'exec-and-forget open -a /Applications/Visual\ Studio\ Code.app/'
+alt-c = 'exec-and-forget open -a /Applications/Cursor.app/'
 alt-i = 'exec-and-forget open -a /Applications/Ghostty.app'
 alt-s = 'exec-and-forget open -a /Applications/Slack.app'
 alt-d = 'exec-and-forget open -a /Applications/Discord.app'
-alt-p = 'exec-and-forget open -a /Applications/Adobe\ Premiere\ Pro\ 2024/Adobe\ Premiere\ Pro\ 2024.app/'
+alt-p = 'exec-and-forget open -a /Applications/Adobe\ Premiere\ Pro\ 2025/Adobe\ Premiere\ Pro\ 2025.app/'
 alt-o = 'exec-and-forget open -a /Applications/OBS.app/'
 alt-w = 'exec-and-forget open -a /Applications/Obsidian.app'
 alt-n = 'exec-and-forget open -a /Applications/Notion.app'
