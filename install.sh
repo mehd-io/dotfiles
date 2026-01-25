@@ -99,6 +99,11 @@ package_to_install="neovim
     echo "================================================="
     brew update
     brew install $package_to_install
+
+    echo "================================================="
+    echo "Installing additional macOS CLI tools (yazi, fzf, etc.)"
+    echo "================================================="
+    brew install yazi ffmpeg sevenzip jq poppler fd ripgrep fzf zoxide resvg imagemagick font-symbols-only-nerd-font dua-cli
  else
     echo "OS NOT DETECTED, couldn't install package $package_to_install"
     exit 1;

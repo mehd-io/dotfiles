@@ -6,6 +6,9 @@ eval "$(duckman completion zsh)"
 export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
 
 
-. "$HOME/.atuin/bin/env"
-
 eval "$(atuin init zsh)"
+
+. "$HOME/.local/bin/env"
+
+export PATH="/Applications/Cursor.app/Contents/Resources/app/bin:$PATH"
+
