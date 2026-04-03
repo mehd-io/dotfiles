@@ -16,8 +16,14 @@ cp /tmp/sketchybar-app-font.ttf "$HOME/Library/Fonts/sketchybar-app-font.ttf"
 rm -f /tmp/sketchybar-app-font.ttf
 echo "Installed sketchybar-app-font to ~/Library/Fonts/"
 
-if [ -d "$HOME/.config/sketchybar" ]; then
+# Backup existing config if it exists and is not already a symlink
+if [ -d "$HOME/.config/sketchybar" ] && [ ! -L "$HOME/.config/sketchybar" ]; then
   cp -r $HOME/.config/sketchybar $HOME/.config/sketchybar_backup
+  rm -rf $HOME/.config/sketchybar
 fi
-cp -r sketchybar $HOME/.config/sketchybar
+
+# Create symlink to dotfiles sketchybar config
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ln -sfn "$DOTFILES_DIR/sketchybar" "$HOME/.config/sketchybar"
+
 brew services restart sketchybar
