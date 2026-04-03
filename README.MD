@@ -6,9 +6,11 @@ This dotfiles repository provides a modern, productive, and visually appealing d
 - [**Sketchybar**](https://github.com/FelixKratz/SketchyBar) — highly customizable status bar for macOS
 - [**Zsh**](https://www.zsh.org/) — main shell with [Starship](https://starship.rs/) prompt using the [Pastel Powerline preset](https://starship.rs/presets/#pastel-powerline)
 - [**Atuin**](https://docs.atuin.sh/) — magical shell history with sync across machines
-- [**Tmux**](https://github.com/tmux/tmux) — terminal multiplexing and session management
+- [**Tmux**](https://github.com/tmux/tmux) — terminal multiplexing with Claude Code integration and process management
 - [**Neovim**](https://neovim.io/) with [**LazyVim**](https://www.lazyvim.org/) — pre-configured, extensible code editing
 - [**Ghostty**](https://ghostty.org/) — fast, native terminal emulator
+- [**Claude Code**](https://docs.anthropic.com/en/docs/claude-code) — AI coding assistant with custom hooks and status line
+- [**1Password CLI**](https://developer.1password.com/docs/cli/) — secrets management via `op inject` (no secrets in dotfiles)
 - [**Hiddenbar**](https://github.com/dwarvesf/hidden) and [**Stats**](https://github.com/exelban/stats) — menu bar and system monitoring
 
 ![Terminal and status bar setup](docs/screenshot.png)
@@ -20,10 +22,12 @@ This dotfiles repository provides a modern, productive, and visually appealing d
 
 - [Getting Started](#getting-started)
 - [What Each Install Script Does](#what-each-install-script-does)
+- [Secrets Management](#secrets-management)
+- [Tmux](#tmux)
+- [Claude Code Integration](#claude-code-integration)
+- [Cheatsheet](#cheatsheet)
 - [My Mac Setup](#my-mac-setup)
 - [About Aerospace](#about-aerospace)
-- [Starship Prompt](#starship-prompt--pastel-powerline)
-- [Tmux](#tmux)
 
 ---
 
@@ -36,6 +40,7 @@ The install script backs up existing configuration files, but read below before 
 **Requirements:**
 - [Git](https://git-scm.com/)
 - [Homebrew](https://brew.sh/) (macOS package manager)
+- [1Password CLI](https://developer.1password.com/docs/cli/) (`op`) — for secrets injection
 
 ```bash
 # Install Homebrew if not already installed
@@ -58,6 +63,7 @@ After installation, you may want to:
 1. **Restart your terminal** to apply all shell changes
 2. **Log out and back in** for Aerospace to take effect
 3. **Configure Atuin** by running `atuin login` to sync shell history across machines
+4. **Set up 1Password** — create items referenced in `zsh/env.tpl` (see [Secrets Management](#secrets-management))
 
 ---
 
@@ -69,10 +75,12 @@ After installation, you may want to:
 - Symlinks configuration files:
   - `~/.zshrc`, `~/.zprofile` (Zsh)
   - `~/.tmux.conf`, `~/.tmux.conf.local` (Tmux)
+  - `~/.tmux/pane-info.sh`, `open-url.sh`, `log-pane.sh` (Tmux runtime scripts)
   - `~/.config/ghostty/config` (Ghostty)
   - `~/.config/starship.toml` (Starship)
   - `~/.config/atuin/config.toml` (Atuin)
   - `~/.config/borders/bordersrc` (Borders)
+  - `~/.claude/settings.json` (Claude Code hooks and status line)
 - Installs macOS apps via Homebrew Cask: Ghostty, Hiddenbar, Stats
 - Installs [LazyVim](https://www.lazyvim.org/) (Neovim starter config)
 - Sets Zsh as default shell
@@ -88,6 +96,72 @@ After installation, you may want to:
 
 - Installs [Aerospace](https://github.com/nikitabobko/AeroSpace) window manager
 - Backs up existing config and symlinks new config
+
+---
+
+## Secrets Management
+
+No secrets are stored in this repo. API keys and tokens are managed via [1Password CLI](https://developer.1password.com/docs/cli/) using `op inject`.
+
+The template file `zsh/env.tpl` contains `op://` references:
+
+```bash
+export motherduck_token={{ op://Private/dev-batbook-shell/motherduck_token }}
+export GEMINI_API_KEY={{ op://Private/dev-batbook-shell/gemini_api_key }}
+```
+
+On shell login, `op inject` resolves these references and caches them for the session (so you only authenticate with 1Password once per boot, not per terminal pane).
+
+**To set up on a new machine:**
+1. Install 1Password and the CLI (`brew install 1password-cli`)
+2. Enable "Connect with 1Password CLI" in 1Password app settings
+3. Create the items referenced in `zsh/env.tpl` in your 1Password vault
+4. Open a new terminal — you'll be prompted for biometric auth once
+
+---
+
+## Tmux
+
+- Theme from [gpakosz/.tmux](https://github.com/gpakosz/.tmux), prefix remapped to backtick (`` ` ``)
+- Vim-style pane navigation (`h/j/k/l`)
+- Pane borders show: git branch, listening ports, devcontainer status
+- Process state written to `/tmp/tmux-proc-state/` for tooling integration
+- Auto-cleanup: when the last pane for a repo closes, orphaned processes and devcontainers are stopped
+
+### Tmux Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `pane-info.sh` | Pane border info: branch, ports, devcontainer links |
+| `open-url.sh` | `prefix + U` — open URLs from pane border in browser |
+| `log-pane.sh` | `prefix + L` — toggle log viewer pane |
+| `toggle-nvim.sh` | `prefix + n` — toggle nvim + Neotree pane |
+| `tmux-cleanup.sh` | Auto-kill processes/devcontainers on pane exit |
+
+---
+
+## Claude Code Integration
+
+Claude Code is configured via `claude/settings.json` (symlinked to `~/.claude/settings.json`).
+
+### Hooks
+
+| Hook | Script | Purpose |
+|------|--------|---------|
+| PreToolUse | `claude-on-busy.sh` | Sets Claude status to "busy" for tmux status line |
+| PreToolUse (Bash) | `claude-pretool-check.sh` | Blocks duplicate server starts when ports are in use |
+| Notification | `claude-on-waiting.sh` | Sets Claude status to "waiting" |
+| Stop / SubagentStop | `claude-on-idle.sh` | Sets Claude status to "idle" |
+
+### Status Line
+
+`claude-statusline.sh` provides a compact status line showing: state icon, directory, git branch (with worktree detection), model, and context remaining.
+
+---
+
+## Cheatsheet
+
+See [docs/cheatsheet.md](docs/cheatsheet.md) for all keyboard shortcuts (tmux, neovim, zsh, Claude Code).
 
 ---
 
@@ -118,7 +192,6 @@ A comprehensive list of apps and tools I use for development and productivity.
 |------|-------------|
 | [Claude Desktop](https://claude.ai/download) | Claude AI desktop app |
 | [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | AI coding assistant CLI |
-| [OpenCode](https://github.com/opencode-ai/opencode) | Open-source AI coding assistant |
 
 ### Window Management & Menu Bar
 
@@ -136,7 +209,7 @@ A comprehensive list of apps and tools I use for development and productivity.
 | [Raycast](https://www.raycast.com/) | Spotlight replacement with extensions |
 | [Obsidian](https://obsidian.md/) | Markdown-based knowledge base |
 | [Notion](https://www.notion.so/) | All-in-one workspace |
-| [1Password](https://1password.com/) | Password manager |
+| [1Password](https://1password.com/) | Password & secrets manager |
 | [Annotate](https://github.com/epilande/Annotate) | Screenshot annotation tool |
 
 ### Development & DevOps
@@ -187,10 +260,3 @@ I made a deep dive video on this tiling window manager:
 ## Starship Prompt : Pastel Powerline
 
 This setup uses [Starship](https://starship.rs/) with the [Pastel Powerline preset](https://starship.rs/presets/#pastel-powerline) for a modern, colorful, and informative shell prompt.
-
----
-
-## Tmux
-
-- Command key remapped from `Ctrl+b` to `Ctrl+a`
-- Using theme from [gpakosz/.tmux](https://github.com/gpakosz/.tmux)
