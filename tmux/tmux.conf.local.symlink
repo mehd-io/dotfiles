@@ -6,6 +6,9 @@
 
 # -- navigation ----------------------------------------------------------------
 
+# new window always opens in $HOME
+bind c new-window -c "$HOME"
+
 # if you're running tmux within iTerm2
 #   - and tmux is 1.9 or 1.9a
 #   - and iTerm2 is configured to let option key act as +Esc
@@ -15,10 +18,25 @@
 
 # custom mehdio
 setw -g mouse on
-# split current window horizontally
-bind h split-window -v
-# split current window vertically
-bind v split-window -h
+
+# -- vim-style navigation (hjkl) ----------------------------------------------
+bind h select-pane -L
+bind j select-pane -D
+bind k select-pane -U
+bind l select-pane -R
+
+# -- splits: - horizontal, | vertical (visual mnemonics) ----------------------
+bind - split-window -v -c "#{pane_current_path}"
+bind | split-window -h -c "#{pane_current_path}"
+
+# -- Shift + vim keys = resize panes ------------------------------------------
+bind -r H resize-pane -L 5
+bind -r J resize-pane -D 5
+bind -r K resize-pane -U 5
+bind -r L resize-pane -R 5
+
+# -- new window ----------------------------------------------------------------
+bind N new-window -c "#{pane_current_path}"
 # -- windows & pane creation ---------------------------------------------------
 
 # new window retains current path, possible values are:
@@ -116,7 +134,7 @@ tmux_conf_theme_terminal_title='#h ❐ #S ● #I #W'
 tmux_conf_theme_window_status_fg='#8a8a8a'              # light gray
 tmux_conf_theme_window_status_bg='#080808'              # dark gray
 tmux_conf_theme_window_status_attr='none'
-tmux_conf_theme_window_status_format='#I #W'
+tmux_conf_theme_window_status_format='#I #W #(~/.dotfiles/tmux/tmux-claude-status.sh "#{pane_id}")'
 #tmux_conf_theme_window_status_format='#{circled_window_index} #W'
 #tmux_conf_theme_window_status_format='#I #W#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,}'
 
@@ -131,7 +149,7 @@ tmux_conf_theme_window_status_format='#I #W'
 tmux_conf_theme_window_status_current_fg='#000000'      # black
 tmux_conf_theme_window_status_current_bg='#00afff'      # light blue
 tmux_conf_theme_window_status_current_attr='bold'
-tmux_conf_theme_window_status_current_format='#I #W'
+tmux_conf_theme_window_status_current_format='#I #W #(~/.dotfiles/tmux/tmux-claude-status.sh "#{pane_id}")'
 #tmux_conf_theme_window_status_current_format='#{circled_window_index} #W'
 #tmux_conf_theme_window_status_current_format='#I #W#{?window_zoomed_flag,🔍,}'
 
@@ -288,12 +306,68 @@ tmux_conf_copy_to_os_clipboard=false
 #set -g status-keys vi
 #set -g mode-keys vi
 
-# replace C-b by C-a instead of using both prefixes
-# set -gu prefix2
-# unbind C-a
-# unbind C-b
-# set -g prefix C-a
-# bind C-a send-prefix
+# replace C-b by backtick instead of using both prefixes
+set -gu prefix2
+unbind C-b
+unbind C-space
+set -g prefix `
+bind ` send-prefix
 
 # move status line to top
 #set -g status-position top
+
+# refresh status bar every second for live claude status icons
+set -g status-interval 1
+
+# -- editor shortcut -----------------------------------------------------------
+
+# prefix + n: toggle nvim pane (open or kill)
+bind n run-shell '~/.dotfiles/tmux/toggle-nvim.sh'
+
+# -- claude code shortcuts -----------------------------------------------------
+
+# prefix + C: new window with claude code
+bind C new-window 'claude'
+
+# prefix + V: vertical split with claude code
+bind V split-window -h 'claude'
+
+# prefix + H: horizontal split with claude code
+bind H split-window -v 'claude'
+
+# -- window naming: folder:branch ---------------------------------------------
+
+# Show folder name (and git branch if in a repo) as window name
+# automatic-rename-format uses pane_current_path to derive the folder name
+set -g automatic-rename on
+set -g automatic-rename-format '#{b:pane_current_path}#{?#{==:#{pane_current_command},claude}, ,}#(cd "#{pane_current_path}" && git rev-parse --abbrev-ref HEAD 2>/dev/null | sed "s/^/:/" | cut -c1-12)'
+
+# -- pane border info bar ---------------------------------------------------
+set -g pane-border-status top
+set -g pane-border-format ' #{pane_index} #(~/.tmux/pane-info.sh "#{pane_current_path}" "#{pane_pid}") '
+
+# -- open devcontainer/pane URLs in browser (prefix + U) --------------------
+bind U display-popup -E -w 50% -h 40% "~/.tmux/open-url.sh"
+
+# -- log pane toggle (prefix + L) -------------------------------------------
+bind L if-shell '[ "$(tmux list-panes -F "#{pane_title}" | grep -c "^logs$")" -gt 0 ]' \
+  'kill-pane -t {bottom}' \
+  'split-window -v -l 20% "exec ~/.tmux/log-pane.sh"'
+
+# -- kill current window (prefix + q) -----------------------------------------
+bind q confirm-before -p "kill window? (y/n)" kill-window
+
+# -- auto-cleanup: kill processes/devcontainers when last pane for a repo closes
+set-hook -g pane-exited 'run-shell "~/.dotfiles/tmux/tmux-cleanup.sh #{hook_pane_pid} #{hook_pane_current_path}"'
+
+# -- TPM plugins ---------------------------------------------------------------
+
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+set -g @plugin 'tmux-plugins/tmux-continuum'
+
+# auto-restore sessions on tmux start
+set -g @continuum-restore 'on'
+
+# Initialize TPM (keep this line at the very bottom)
+run '~/.tmux/plugins/tpm/tpm'

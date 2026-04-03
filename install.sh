@@ -104,6 +104,12 @@ package_to_install="neovim
     echo "Installing additional macOS CLI tools (yazi, fzf, etc.)"
     echo "================================================="
     brew install yazi ffmpeg sevenzip jq poppler fd ripgrep fzf zoxide resvg imagemagick font-symbols-only-nerd-font dua-cli
+
+    echo "================================================="
+    echo "Installing AWS CLI and Google Cloud CLI"
+    echo "================================================="
+    brew install awscli
+    brew install --cask google-cloud-sdk
  else
     echo "OS NOT DETECTED, couldn't install package $package_to_install"
     exit 1;
@@ -151,3 +157,28 @@ echo "================================================="
 git clone https://github.com/LazyVim/starter ~/.config/nvim
 rm -rf ~/.config/nvim/.git
 echo "LazyVim installed! Start Neovim with 'nvim' and refer to the comments in the files to customize."
+
+echo "================================================="
+echo "Symlink tmux runtime scripts"
+echo "================================================="
+mkdir -p $HOME/.tmux
+ln -s -f $DOTFILES/tmux/pane-info.sh $HOME/.tmux/pane-info.sh
+ln -s -f $DOTFILES/tmux/open-url.sh $HOME/.tmux/open-url.sh
+ln -s -f $DOTFILES/tmux/log-pane.sh $HOME/.tmux/log-pane.sh
+chmod +x $DOTFILES/tmux/pane-info.sh $DOTFILES/tmux/open-url.sh $DOTFILES/tmux/log-pane.sh
+chmod +x $DOTFILES/tmux/tmux-cleanup.sh
+
+echo "================================================="
+echo "Install Claude Code config"
+echo "================================================="
+mkdir -p $HOME/.claude
+# Symlink settings (hooks, statusLine, model)
+ln -s -f $DOTFILES/claude/settings.json $HOME/.claude/settings.json
+# Make hook and statusline scripts executable
+chmod +x $DOTFILES/tmux/claude-on-busy.sh
+chmod +x $DOTFILES/tmux/claude-on-idle.sh
+chmod +x $DOTFILES/tmux/claude-on-waiting.sh
+chmod +x $DOTFILES/tmux/claude-pretool-check.sh
+chmod +x $DOTFILES/tmux/claude-statusline.sh
+chmod +x $DOTFILES/tmux/tmux-claude-status.sh
+echo "Claude Code config installed."
