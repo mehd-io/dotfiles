@@ -105,8 +105,6 @@ outer.left= 5
 
 # App shortcuts
 alt-b = 'exec-and-forget open -a /Applications/Brave\ Browser.app'
-#alt-c = 'exec-and-forget open -a /Applications/Visual\ Studio\ Code.app/'
-alt-c = 'exec-and-forget open -a /Applications/Cursor.app/'
 alt-i = 'exec-and-forget open -a /Applications/Ghostty.app'
 alt-s = 'exec-and-forget open -a /Applications/Slack.app'
 alt-d = 'exec-and-forget open -a /Applications/Discord.app'
@@ -114,7 +112,7 @@ alt-p = 'exec-and-forget open -a /Applications/Adobe\ Premiere\ Pro\ 2025/Adobe\
 alt-o = 'exec-and-forget open -a /Applications/OBS.app/'
 alt-w = 'exec-and-forget open -a /Applications/Obsidian.app'
 alt-n = 'exec-and-forget open -a /Applications/Notion.app'
-alt-a = 'exec-and-forget open -a /Applications/ChatGPT.app'
+alt-a = 'exec-and-forget open -a /Applications/Claude.app'
 alt-shift-r = ['exec-and-forget /opt/homebrew/bin/sketchybar --reload']
 
 # See: https://nikitabobko.github.ioeAeroSpace/commands#layout
@@ -216,8 +214,12 @@ if.app-id ='com.hnc.Discord'
 run = ['move-node-to-workspace 5']
 
 [[on-window-detected]]
-if.app-id ='com.adobe.PremierePro.24'
+if.app-id ='com.adobe.PremierePro.26'
 run = ['move-node-to-workspace 6']
+
+[[on-window-detected]]
+if.app-id ='com.anthropic.claudefordesktop'
+run = ['move-node-to-workspace 2']
 
 # force certain workspaces to certain monitors
 [workspace-to-monitor-force-assignment]
