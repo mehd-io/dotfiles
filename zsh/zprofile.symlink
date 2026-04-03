@@ -1,35 +1,13 @@
 alias v="nvim"
-export GEMINI_API_KEY=  # Set your Gemini API key here
+alias cc="claude"
+# Secrets injected from 1Password — only once per machine boot (cached in tmpfile)
+_OP_CACHE="/tmp/.op-env-$(id -u)"
+if [ ! -f "$_OP_CACHE" ] || [ "$(( $(date +%s) - $(stat -f %m "$_OP_CACHE") ))" -gt 86400 ]; then
+  op inject -i ~/.dotfiles/zsh/env.tpl > "$_OP_CACHE" 2>/dev/null && chmod 600 "$_OP_CACHE"
+fi
+[ -f "$_OP_CACHE" ] && source "$_OP_CACHE"
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
-kubecfg () {
-    declare -a kcfgs;
-    ki=1;
-    for FILE in $(find ~/.kube/ -maxdepth 1 \( -type f -o -type l \) | xargs -n1 basename | sort);
-    do
-        kcfgs[${ki}]=$FILE;
-        let ki+=1;
-    done;
-    if [[ -z "${1}" ]]; then
-        ki=1;
-        for ITEM in ${kcfgs[*]};
-        do
-            echo "${ki}: ${ITEM}";
-            let ki+=1;
-        done;
-        if [[ "$(basename ${SHELL})" == "bash" ]]; then
-            read -p "Pick config to load" kcfg;
-        else
-            # zsh
-            read "?Pick config to load " kcfg;
-        fi
-        echo;
-    else
-        kcfg="${1}";
-    fi;
-    export KUBECONFIG="$(readlink ~/.kube/${kcfgs[${kcfg}]} || ls -1 ~/.kube/${kcfgs[${kcfg}]})"
-    echo "KUBECONFIG=${KUBECONFIG}"
-}
 
 # AWS
 aws-profile-ls () {
@@ -98,3 +76,7 @@ fi
 # Added by OrbStack: command-line tools and integration
 # This won't be added again if you remove it.
 source ~/.orbstack/shell/init.zsh 2>/dev/null || :
+
+
+# Added by Obsidian
+export PATH="$PATH:/Applications/Obsidian.app/Contents/MacOS"

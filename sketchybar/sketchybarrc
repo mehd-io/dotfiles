@@ -113,6 +113,8 @@ sketchybar --add item clock right \
   --add item volume right \
   --set volume script="$PLUGIN_DIR/volume.sh" \
   --subscribe volume volume_change \
+  --add item annotate_highlighter right \
+  --set annotate_highlighter update_freq=2 script="$PLUGIN_DIR/annotate_highlighter.sh" \
   --add item battery right \
   --set battery update_freq=120 script="$PLUGIN_DIR/battery.sh" \
   --subscribe battery system_woke power_source_change \

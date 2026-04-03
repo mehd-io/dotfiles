@@ -8,7 +8,43 @@ export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
 
 eval "$(atuin init zsh)"
 
+# zoxide - smart directory jumping (z, zi)
+eval "$(zoxide init zsh)"
+
+# Quick jump to git repos with fzf (Ctrl+G)
+repo() {
+  local dir
+  dir=$(find ~/repos/mehd-io ~/repos/motherduckdb -mindepth 1 -maxdepth 1 -type d 2>/dev/null | fzf --prompt="repo> ")
+  [ -n "$dir" ] && cd "$dir"
+}
+bindkey -s '^g' 'repo\n'
+
 . "$HOME/.local/bin/env"
 
 export PATH="/Applications/Cursor.app/Contents/Resources/app/bin:$PATH"
 
+
+# opencode
+export PATH=/Users/mehdio/.opencode/bin:$PATH
+
+# Show active processes/devcontainers when entering a repo directory
+_tmux_repo_status() {
+  [ -z "$TMUX" ] && return
+  local repo_root=$(git rev-parse --show-toplevel 2>/dev/null)
+  [ -z "$repo_root" ] && return
+  local hash=$(echo -n "$repo_root" | md5 -q 2>/dev/null || echo -n "$repo_root" | md5sum | cut -d' ' -f1)
+  local state_file="/tmp/tmux-proc-state/${hash}.env"
+  [ -f "$state_file" ] || return
+  # Ignore stale files (older than 60s)
+  local file_age=$(( $(date +%s) - $(stat -f %m "$state_file" 2>/dev/null || echo 0) ))
+  [ "$file_age" -gt 60 ] && return
+  local ports=$(grep '^LOCAL_PORTS=' "$state_file" | cut -d= -f2)
+  local procs=$(grep '^PROCESSES=' "$state_file" | cut -d= -f2)
+  local dc=$(grep '^DEVCONTAINER_ID=' "$state_file" | cut -d= -f2)
+  local out=""
+  [ -n "$ports" ] && out="${out}\033[36m[ports: ${ports}]\033[0m "
+  [ -n "$dc" ] && out="${out}\033[33m[devcontainer: running]\033[0m "
+  [ -n "$procs" ] && out="${out}\033[32m[${procs}]\033[0m"
+  [ -n "$out" ] && printf "$out\n"
+}
+chpwd_functions+=(_tmux_repo_status)
