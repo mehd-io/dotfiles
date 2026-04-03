@@ -347,7 +347,7 @@ set -g pane-border-status top
 set -g pane-border-format ' #{pane_index} #(~/.tmux/pane-info.sh "#{pane_current_path}" "#{pane_pid}") '
 
 # -- open devcontainer/pane URLs in browser (prefix + U) --------------------
-bind U display-popup -E -w 50% -h 40% "~/.tmux/open-url.sh"
+bind u display-popup -E -w 50% -h 40% "~/.tmux/open-url.sh"
 
 # -- log pane toggle (prefix + L) -------------------------------------------
 bind L if-shell '[ "$(tmux list-panes -F "#{pane_title}" | grep -c "^logs$")" -gt 0 ]' \
