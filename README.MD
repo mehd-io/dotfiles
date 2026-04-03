@@ -87,7 +87,7 @@ After installation, you may want to:
 ### install_sketchybar.sh
 
 - Installs [Sketchybar](https://github.com/FelixKratz/SketchyBar) and dependencies (sf-symbols, jq, gh)
-- Downloads and installs the Sketchybar app font
+- Downloads and installs [sketchybar-app-font](https://github.com/kvndrsslr/sketchybar-app-font) (required for workspace app icons)
 - Backs up existing config and symlinks new config
 - Restarts Sketchybar service
 
