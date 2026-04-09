@@ -10,7 +10,7 @@ This dotfiles repository provides a modern, productive, and visually appealing d
 - [**Neovim**](https://neovim.io/) with [**LazyVim**](https://www.lazyvim.org/) — pre-configured, extensible code editing
 - [**Ghostty**](https://ghostty.org/) — fast, native terminal emulator
 - [**Claude Code**](https://docs.anthropic.com/en/docs/claude-code) — AI coding assistant with custom hooks and status line
-- [**1Password CLI**](https://developer.1password.com/docs/cli/) — secrets management via `op inject` (no secrets in dotfiles)
+- [**1Password CLI**](https://developer.1password.com/docs/cli/) — secrets injected at login via `op inject`
 - [**Hiddenbar**](https://github.com/dwarvesf/hidden) and [**Stats**](https://github.com/exelban/stats) — menu bar and system monitoring
 
 ![Terminal and status bar setup](docs/screenshot.png)
@@ -88,7 +88,7 @@ After installation, you may want to:
 ### install_sketchybar.sh
 
 - Installs [Sketchybar](https://github.com/FelixKratz/SketchyBar) and dependencies (sf-symbols, jq, gh)
-- Downloads and installs the Sketchybar app font
+- Downloads and installs [sketchybar-app-font](https://github.com/kvndrsslr/sketchybar-app-font) (required for workspace app icons)
 - Backs up existing config and symlinks new config
 - Restarts Sketchybar service
 
@@ -101,22 +101,7 @@ After installation, you may want to:
 
 ## Secrets Management
 
-No secrets are stored in this repo. API keys and tokens are managed via [1Password CLI](https://developer.1password.com/docs/cli/) using `op inject`.
-
-The template file `zsh/env.tpl` contains `op://` references:
-
-```bash
-export motherduck_token={{ op://Private/dev-batbook-shell/motherduck_token }}
-export GEMINI_API_KEY={{ op://Private/dev-batbook-shell/gemini_api_key }}
-```
-
-On shell login, `op inject` resolves these references and caches them for the session (so you only authenticate with 1Password once per boot, not per terminal pane).
-
-**To set up on a new machine:**
-1. Install 1Password and the CLI (`brew install 1password-cli`)
-2. Enable "Connect with 1Password CLI" in 1Password app settings
-3. Create the items referenced in `zsh/env.tpl` in your 1Password vault
-4. Open a new terminal — you'll be prompted for biometric auth once
+Environment variables (API keys, tokens) are injected at first login via [1Password CLI](https://developer.1password.com/docs/cli/) `op inject`. The template `zsh/env.tpl` contains `op://` references that resolve at runtime and are cached for the session.
 
 ---
 
