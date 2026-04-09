@@ -357,6 +357,9 @@ bind L if-shell '[ "$(tmux list-panes -F "#{pane_title}" | grep -c "^logs$")" -g
 # -- kill current window (prefix + q) -----------------------------------------
 bind q confirm-before -p "kill window? (y/n)" kill-window
 
+# -- claude conversation search (prefix + f) -----------------------------------
+bind f new-window -n "claude-search" "~/.dotfiles/scripts/claude-search.sh"
+
 # -- auto-cleanup: kill processes/devcontainers when last pane for a repo closes
 set-hook -g pane-exited 'run-shell "~/.dotfiles/tmux/tmux-cleanup.sh #{hook_pane_pid} #{hook_pane_current_path}"'
 

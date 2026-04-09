@@ -181,4 +181,5 @@ chmod +x $DOTFILES/tmux/claude-on-waiting.sh
 chmod +x $DOTFILES/tmux/claude-pretool-check.sh
 chmod +x $DOTFILES/tmux/claude-statusline.sh
 chmod +x $DOTFILES/tmux/tmux-claude-status.sh
+chmod +x $DOTFILES/scripts/claude-search.sh
 echo "Claude Code config installed."
