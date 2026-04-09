@@ -63,6 +63,7 @@ After installation, you may want to:
 1. **Restart your terminal** to apply all shell changes
 2. **Log out and back in** for Aerospace to take effect
 3. **Configure Atuin** by running `atuin login` to sync shell history across machines
+4. **Set up 1Password** — create items referenced in `zsh/env.tpl` (see [Secrets Management](#secrets-management))
 
 ---
 
