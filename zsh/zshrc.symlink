@@ -26,6 +26,9 @@ export PATH="/Applications/Cursor.app/Contents/Resources/app/bin:$PATH"
 
 # opencode
 export PATH=/Users/mehdio/.opencode/bin:$PATH
+alias oc-sonnet='opencode --model openrouter/anthropic/claude-sonnet-4.6'
+alias oc-gpt5='opencode --model openrouter/openai/gpt-5-nano'
+alias oc-gpt54='opencode --model openrouter/openai/gpt-5.4-nano'
 
 # Show active processes/devcontainers when entering a repo directory
 _tmux_repo_status() {
@@ -48,3 +51,10 @@ _tmux_repo_status() {
   [ -n "$out" ] && printf "$out\n"
 }
 chpwd_functions+=(_tmux_repo_status)
+
+# bun completions
+[ -s "/Users/mehdio/.bun/_bun" ] && source "/Users/mehdio/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
