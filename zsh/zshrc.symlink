@@ -1,3 +1,5 @@
+export OBSIDIAN_VAULT="$HOME/Documents/mehdio_sb"
+
 autoload -U +X compinit && compinit
 autoload -U +X bashcompinit && bashcompinit
 eval "$(starship init zsh)"

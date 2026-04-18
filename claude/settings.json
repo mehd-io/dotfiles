@@ -1,4 +1,7 @@
 {
+  "permissions": {
+    "defaultMode": "auto"
+  },
   "hooks": {
     "PreToolUse": [
       {
@@ -35,6 +38,12 @@
           {
             "type": "command",
             "command": "bash ~/.dotfiles/tmux/claude-on-idle.sh"
+          },
+          {
+            "type": "command",
+            "command": "uv run ~/.dotfiles/scripts/sync_claude_to_obsidian.py 2>/dev/null || true",
+            "async": true,
+            "statusMessage": "Syncing session to Obsidian..."
           }
         ]
       }
@@ -58,7 +67,5 @@
     "frontend-design@claude-plugins-official": true
   },
   "skipAutoPermissionPrompt": true,
-  "permissions": {
-    "defaultMode": "auto"
-  }
+  "model": "sonnet"
 }
