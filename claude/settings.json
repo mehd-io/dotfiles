@@ -54,5 +54,11 @@
     "type": "command",
     "command": "bash ~/.dotfiles/tmux/claude-statusline.sh"
   },
-  "model": "sonnet"
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true
+  },
+  "skipAutoPermissionPrompt": true,
+  "permissions": {
+    "defaultMode": "auto"
+  }
 }

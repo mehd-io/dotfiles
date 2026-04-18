@@ -134,7 +134,7 @@ tmux_conf_theme_terminal_title='#h ❐ #S ● #I #W'
 tmux_conf_theme_window_status_fg='#8a8a8a'              # light gray
 tmux_conf_theme_window_status_bg='#080808'              # dark gray
 tmux_conf_theme_window_status_attr='none'
-tmux_conf_theme_window_status_format='#I #W #(~/.dotfiles/tmux/tmux-claude-status.sh "#{pane_id}")'
+tmux_conf_theme_window_status_format='#I #(~/.dotfiles/tmux/tmux-tab-cell.sh "#{pane_id}" "#{pane_current_path}" "#{pane_current_command}")'
 #tmux_conf_theme_window_status_format='#{circled_window_index} #W'
 #tmux_conf_theme_window_status_format='#I #W#{?window_bell_flag,🔔,}#{?window_zoomed_flag,🔍,}'
 
@@ -149,7 +149,7 @@ tmux_conf_theme_window_status_format='#I #W #(~/.dotfiles/tmux/tmux-claude-statu
 tmux_conf_theme_window_status_current_fg='#000000'      # black
 tmux_conf_theme_window_status_current_bg='#00afff'      # light blue
 tmux_conf_theme_window_status_current_attr='bold'
-tmux_conf_theme_window_status_current_format='#I #W #(~/.dotfiles/tmux/tmux-claude-status.sh "#{pane_id}")'
+tmux_conf_theme_window_status_current_format='#I #(~/.dotfiles/tmux/tmux-tab-cell.sh "#{pane_id}" "#{pane_current_path}" "#{pane_current_command}")'
 #tmux_conf_theme_window_status_current_format='#{circled_window_index} #W'
 #tmux_conf_theme_window_status_current_format='#I #W#{?window_zoomed_flag,🔍,}'
 
@@ -202,7 +202,7 @@ tmux_conf_theme_right_separator_sub='|'
 #     - #{username}
 #     - #{username_ssh}
 tmux_conf_theme_status_left=' ❐ #S '
-tmux_conf_theme_status_right='#{prefix}#{pairing}#{synchronized} , %R , %d %b | #{username}#{root} | #{hostname} '
+tmux_conf_theme_status_right='#{prefix}#{pairing}#{synchronized} , %R , %d %b | #{username}#{root} '
 
 # status left style
 tmux_conf_theme_status_left_fg='#000000,#e4e4e4,#e4e4e4'  # black, white , white
@@ -210,9 +210,9 @@ tmux_conf_theme_status_left_bg='##f7f571,#ffffff,#00afff'  # light yellow, white
 tmux_conf_theme_status_left_attr='bold,none,none'
 
 # status right style
-tmux_conf_theme_status_right_fg='#8a8a8a,#e4e4e4,#000000' # light gray, white, black
-tmux_conf_theme_status_right_bg='#080808,#d70000,#e4e4e4' # dark gray, red, white
-tmux_conf_theme_status_right_attr='none,none,bold'
+tmux_conf_theme_status_right_fg='#8a8a8a,#e4e4e4' # light gray, white
+tmux_conf_theme_status_right_bg='#080808,#d70000' # dark gray, red
+tmux_conf_theme_status_right_attr='none,none'
 
 # pairing indicator
 tmux_conf_theme_pairing='👓 '          # U+1F453
@@ -319,6 +319,9 @@ bind ` send-prefix
 # refresh status bar every second for live claude status icons
 set -g status-interval 1
 
+# single status bar with fixed-width tab cells
+set -g status on
+
 # -- editor shortcut -----------------------------------------------------------
 
 # prefix + n: toggle nvim pane (open or kill)
@@ -337,10 +340,9 @@ bind H split-window -v 'claude'
 
 # -- window naming: folder:branch ---------------------------------------------
 
-# Show folder name (and git branch if in a repo) as window name
-# automatic-rename-format uses pane_current_path to derive the folder name
+# Show folder name as window name (branch info moves to status line 2)
 set -g automatic-rename on
-set -g automatic-rename-format '#{b:pane_current_path}#{?#{==:#{pane_current_command},claude}, ,}#(cd "#{pane_current_path}" && git rev-parse --abbrev-ref HEAD 2>/dev/null | sed "s/^/:/" | cut -c1-12)'
+set -g automatic-rename-format '#{b:pane_current_path}'
 
 # -- pane border info bar ---------------------------------------------------
 set -g pane-border-status top
@@ -356,6 +358,9 @@ bind L if-shell '[ "$(tmux list-panes -F "#{pane_title}" | grep -c "^logs$")" -g
 
 # -- kill current window (prefix + q) -----------------------------------------
 bind q confirm-before -p "kill window? (y/n)" kill-window
+
+# -- fuzzy session switcher (prefix + S) ---------------------------------------
+bind S display-popup -E -w 50% -h 40% "tmux list-sessions -F '#{session_name}' | fzf --tmux center --reverse --no-info --prompt='session> ' | xargs -I{} tmux switch-client -t {}"
 
 # -- claude conversation search (prefix + f) -----------------------------------
 bind f new-window -n "claude-search" "~/.dotfiles/scripts/claude-search.sh"

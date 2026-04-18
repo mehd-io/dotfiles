@@ -106,6 +106,7 @@ outer.left= 5
 # App shortcuts
 alt-b = 'exec-and-forget open -a /Applications/Brave\ Browser.app'
 alt-i = 'exec-and-forget open -a /Applications/Ghostty.app'
+alt-c = 'exec-and-forget open -a /Applications/Cursor.app'
 alt-s = 'exec-and-forget open -a /Applications/Slack.app'
 alt-d = 'exec-and-forget open -a /Applications/Discord.app'
 alt-p = 'exec-and-forget open -a /Applications/Adobe\ Premiere\ Pro\ 2025/Adobe\ Premiere\ Pro\ 2025.app/'
