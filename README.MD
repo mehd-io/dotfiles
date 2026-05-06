@@ -1,6 +1,9 @@
 # dotfiles
 
-This dotfiles repository provides a modern, productive, and visually appealing development environment for macOS. It brings together:
+> **My productivity setup for macOS. Linux is best-effort.**
+> Window-management bits (Aerospace, Sketchybar, Hiddenbar, Stats, screencapture defaults) are macOS-only. Shell tooling (zsh, tmux, neovim, starship, atuin, fzf, ripgrep, fd, etc.) is portable. `linux.sh` covers the CLI subset on `apt` / `dnf` / `pacman`; macOS-only steps skip themselves with a notice. PRs to harden Linux welcome.
+
+A modern, opinionated development environment for macOS:
 
 - [**Aerospace**](https://github.com/nikitabobko/AeroSpace) — i3-like tiling window manager for macOS
 - [**Sketchybar**](https://github.com/FelixKratz/SketchyBar) — highly customizable status bar for macOS
@@ -52,9 +55,19 @@ The install script backs up existing configuration files, but read below before 
 ```bash
 git clone https://github.com/mehd-io/dotfiles ~/.dotfiles
 cd ~/.dotfiles
-./install.sh              # Core tools, symlinks, Ghostty, Starship, Hiddenbar, Stats, LazyVim, Atuin
-./install_sketchybar.sh   # Sketchybar and dependencies
-./install_aerospace.sh    # Aerospace window manager
+./install.sh              # Full install: apps + macOS defaults + dotfiles + neovim + sketchybar + aerospace
+```
+
+Run a subset via flags:
+
+```bash
+./install.sh --apps          # Homebrew packages from Brewfile
+./install.sh --defaults      # macOS defaults (runs macos.sh)
+./install.sh --dotfiles      # symlinks for zsh, tmux, ghostty, starship, atuin, claude, borders
+./install.sh --neovim        # clone LazyVim starter
+./install.sh --sketchybar    # symlink sketchybar config + install custom font
+./install.sh --aerospace     # symlink aerospace config
+./install.sh --help
 ```
 
 ### Post-Install
@@ -67,35 +80,53 @@ After installation, you may want to:
 
 ---
 
-## What Each Install Script Does
+## Repo Layout
 
-### install.sh
+| File | Purpose |
+|------|---------|
+| `Brewfile` | macOS source of truth: Homebrew formulae + casks. Run with `brew bundle`. Each entry has a one-line comment. |
+| `install.sh` | OS-aware orchestrator. Subcommands install apps, defaults, dotfiles, neovim, sketchybar, aerospace. macOS-only steps skip themselves on Linux. |
+| `macos.sh` | macOS `defaults write` settings, one comment per line. Safe to run standalone. |
+| `linux.sh` | Linux best-effort: detects `apt` / `dnf` / `pacman` and installs the portable CLI subset. |
 
-- Installs packages via Homebrew: neovim, tmux, tree, wget, zsh, curl, starship, atuin
-- Symlinks configuration files:
-  - `~/.zshrc`, `~/.zprofile` (Zsh)
-  - `~/.tmux.conf`, `~/.tmux.conf.local` (Tmux)
-  - `~/.tmux/pane-info.sh`, `open-url.sh`, `log-pane.sh` (Tmux runtime scripts)
-  - `~/.config/ghostty/config` (Ghostty)
-  - `~/.config/starship.toml` (Starship)
-  - `~/.config/atuin/config.toml` (Atuin)
-  - `~/.config/borders/bordersrc` (Borders)
-  - `~/.claude/settings.json` (Claude Code hooks and status line)
-- Installs macOS apps via Homebrew Cask: Ghostty, Hiddenbar, Stats
-- Installs [LazyVim](https://www.lazyvim.org/) (Neovim starter config)
-- Sets Zsh as default shell
+## What Each Subcommand Does
 
-### install_sketchybar.sh
+### `--apps`
 
-- Installs [Sketchybar](https://github.com/FelixKratz/SketchyBar) and dependencies (sf-symbols, jq, gh)
-- Downloads and installs [sketchybar-app-font](https://github.com/kvndrsslr/sketchybar-app-font) (required for workspace app icons)
-- Backs up existing config and symlinks new config
-- Restarts Sketchybar service
+**macOS:** runs `brew bundle --file=Brewfile`. Installs all CLI tools (neovim, tmux, atuin, fzf, ripgrep, etc.), data tooling (duckdb, libpq), cloud CLIs (aws, gcloud), window manager + status bar (aerospace, sketchybar, hiddenbar, stats), terminal (ghostty), and apps (1Password, Raycast, Obsidian, Notion, Slack, Spotify, Brave, Chrome, Firefox, Cursor, Claude Desktop, etc.).
 
-### install_aerospace.sh
+**Linux:** runs `linux.sh`, which detects `apt` / `dnf` / `pacman` and installs the portable CLI subset (no GUI casks, no macOS tools). starship, atuin, and yazi fall back to their official install scripts when not packaged.
 
-- Installs [Aerospace](https://github.com/nikitabobko/AeroSpace) window manager
-- Backs up existing config and symlinks new config
+### `--defaults`
+
+macOS only. Runs `macos.sh`. Sets dock, menu bar, keyboard, text input (disables smart quotes / em-dash substitution), Finder, screenshot, animation, and multi-monitor preferences. Each line is annotated; comment out anything you want to skip. Skipped on Linux with a notice.
+
+### `--dotfiles`
+
+Backs up any existing real files in `~` to `~/dotfiles-backup`, then creates symlinks for:
+
+- `~/.zshrc`, `~/.zprofile` (Zsh)
+- `~/.tmux.conf`, `~/.tmux.conf.local` (Tmux)
+- `~/.tmux/pane-info.sh`, `open-url.sh`, `log-pane.sh` (Tmux runtime scripts)
+- `~/.config/ghostty/config` (Ghostty)
+- `~/.config/starship.toml` (Starship)
+- `~/.config/atuin/config.toml` (Atuin)
+- `~/.config/borders/bordersrc` (Borders)
+- `~/.claude/settings.json` (Claude Code hooks and status line)
+
+Sets Zsh as the default shell.
+
+### `--neovim`
+
+Clones the [LazyVim](https://www.lazyvim.org/) starter into `~/.config/nvim`. Skips if already present.
+
+### `--sketchybar`
+
+macOS only. Symlinks the sketchybar config to `~/.config/sketchybar`, downloads [sketchybar-app-font](https://github.com/kvndrsslr/sketchybar-app-font) for workspace app icons, and restarts the brew service. The sketchybar formula itself comes from `--apps`. Skipped on Linux.
+
+### `--aerospace`
+
+macOS only. Symlinks `aerospace.toml` to `~/.config/aerospace/aerospace.toml`. The aerospace cask comes from `--apps`. Skipped on Linux.
 
 ---
 
