@@ -25,6 +25,7 @@ ensure_brew() {
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   fi
   eval "$(/opt/homebrew/bin/brew shellenv)"
+  brew update
 }
 
 # --- subcommands ---------------------------------------------------------
@@ -32,7 +33,12 @@ ensure_brew() {
 install_apps() {
   echo ">>> apps (brew bundle)"
   ensure_brew
-  brew bundle --file="$DOTFILES/Brewfile"
+  # --no-lock: skip Brewfile.lock.json generation
+  # Allow partial failures (a single cask download blip won't abort the whole run)
+  brew bundle --file="$DOTFILES/Brewfile" --no-lock || {
+    echo ""
+    echo "WARNING: brew bundle had failures. Run 'brew bundle --file=~/.dotfiles/Brewfile' to retry failed items."
+  }
 }
 
 install_defaults() {

@@ -27,6 +27,7 @@ brew "aria2"                         # parallel downloader
 brew "rclone"                        # rsync for cloud storage (S3, GDrive, etc)
 brew "yt-dlp"                        # YouTube downloader
 brew "mkvtoolnix"                    # MKV video manipulation (mkvmerge etc)
+brew "oven-sh/bun/bun"               # JavaScript runtime + bundler + package manager
 
 # === Data tooling ===
 brew "duckdb"                        # in-process analytics db
@@ -55,7 +56,7 @@ cask "font-hack-nerd-font"           # Hack with nerd-font glyphs (terminal)
 cask "font-symbols-only-nerd-font"   # only the nerd-font icons, used by yazi
 cask "sf-symbols"                    # Apple symbol library, used by Sketchybar
 
-# === Apps (move from manual installs to brew) ===
+# === Apps ===
 cask "1password"                     # password manager
 cask "raycast"                       # Spotlight replacement
 cask "obsidian"                      # knowledge base / notes
@@ -63,7 +64,6 @@ cask "notion"                        # docs / wiki
 cask "slack"                         # chat
 cask "spotify"                       # music
 cask "whatsapp"                      # chat
-cask "vlc"                           # media player
 cask "obs"                           # screen recording / streaming
 cask "tailscale"                     # VPN mesh
 cask "figma"                         # design
@@ -74,10 +74,9 @@ cask "google-chrome"                 # browser
 cask "firefox"                       # browser
 cask "ollama"                        # local LLM runner
 cask "keka"                          # archive utility (rar, 7z, etc)
-cask "libreoffice"                   # office suite (open .docx etc)
 
-# === Optional / hardware-specific. Uncomment if you still need them. ===
-# cask "displaylink"                 # DisplayLink dock driver
+# === Optional: uncomment if needed ===
+# cask "vlc"                         # media player (~100MB)
 # cask "nordvpn"                     # VPN (skip if Tailscale covers your needs)
 # cask "visual-studio-code"          # you mostly use Cursor now
 
