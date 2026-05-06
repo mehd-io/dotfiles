@@ -1,32 +1,22 @@
 #!/usr/bin/env bash
-# install.sh: dotfiles bootstrap. macOS-first, Linux best-effort.
+# install.sh: dotfiles bootstrap for macOS.
 # Idempotent. Run any subset via flags.
 #
 # Usage:
 #   ./install.sh                  full install (apps + defaults + dotfiles + neovim + sketchybar + aerospace)
 #   ./install.sh --full           same as no args
-#   ./install.sh --apps           macOS: brew bundle from Brewfile. Linux: runs linux.sh
-#   ./install.sh --defaults       macOS only: runs macos.sh. Skipped on Linux
+#   ./install.sh --apps           brew bundle from Brewfile
+#   ./install.sh --defaults       macOS defaults (runs macos.sh)
 #   ./install.sh --dotfiles       symlinks (zsh, tmux, ghostty, starship, atuin, claude, borders) + chmods
 #   ./install.sh --neovim         clone LazyVim starter into ~/.config/nvim
-#   ./install.sh --sketchybar     macOS only: symlink config + download font + restart service
-#   ./install.sh --aerospace      macOS only: symlink aerospace.toml
+#   ./install.sh --sketchybar     symlink config + download font + restart service
+#   ./install.sh --aerospace      symlink aerospace.toml
 #   ./install.sh --help
 
 set -e
 
 DOTFILES="$HOME/.dotfiles"
 BACKUP_DIR="$HOME/dotfiles-backup"
-OS="$(uname -s)"
-
-mac_only() {
-  # Returns 0 if on macOS, 1 otherwise (with a skip message)
-  if [ "$OS" != "Darwin" ]; then
-    echo ">>> $1 is macOS-only, skipping on $OS"
-    return 1
-  fi
-  return 0
-}
 
 # --- helpers -------------------------------------------------------------
 
@@ -40,25 +30,12 @@ ensure_brew() {
 # --- subcommands ---------------------------------------------------------
 
 install_apps() {
-  case "$OS" in
-    Darwin)
-      echo ">>> apps (brew bundle)"
-      ensure_brew
-      brew bundle --file="$DOTFILES/Brewfile"
-      ;;
-    Linux)
-      echo ">>> apps (linux.sh, portable subset)"
-      bash "$DOTFILES/linux.sh"
-      ;;
-    *)
-      echo "Unsupported OS: $OS. Install packages manually."
-      exit 1
-      ;;
-  esac
+  echo ">>> apps (brew bundle)"
+  ensure_brew
+  brew bundle --file="$DOTFILES/Brewfile"
 }
 
 install_defaults() {
-  mac_only "macOS defaults" || return 0
   echo ">>> macOS defaults"
   bash "$DOTFILES/macos.sh"
 }
@@ -80,23 +57,23 @@ install_dotfiles() {
   done
 
   # Top-level dotfile symlinks
-  ln -sfn "$DOTFILES/zsh/zshrc.symlink"          "$HOME/.zshrc"
-  ln -sfn "$DOTFILES/zsh/zprofile.symlink"       "$HOME/.zprofile"
-  ln -sfn "$DOTFILES/tmux/tmux.conf.symlink"     "$HOME/.tmux.conf"
+  ln -sfn "$DOTFILES/zsh/zshrc.symlink"            "$HOME/.zshrc"
+  ln -sfn "$DOTFILES/zsh/zprofile.symlink"         "$HOME/.zprofile"
+  ln -sfn "$DOTFILES/tmux/tmux.conf.symlink"       "$HOME/.tmux.conf"
   ln -sfn "$DOTFILES/tmux/tmux.conf.local.symlink" "$HOME/.tmux.conf.local"
 
   # ~/.config/* symlinks
   mkdir -p "$HOME/.config/borders" "$HOME/.config/ghostty" "$HOME/.config/atuin"
-  ln -sfn "$DOTFILES/borders/bordersrc.symlink"  "$HOME/.config/borders/bordersrc"
-  ln -sfn "$DOTFILES/ghostty/config"             "$HOME/.config/ghostty/config"
-  ln -sfn "$DOTFILES/starship/starship.toml"     "$HOME/.config/starship.toml"
-  ln -sfn "$DOTFILES/atuin/config.toml"          "$HOME/.config/atuin/config.toml"
+  ln -sfn "$DOTFILES/borders/bordersrc.symlink" "$HOME/.config/borders/bordersrc"
+  ln -sfn "$DOTFILES/ghostty/config"            "$HOME/.config/ghostty/config"
+  ln -sfn "$DOTFILES/starship/starship.toml"    "$HOME/.config/starship.toml"
+  ln -sfn "$DOTFILES/atuin/config.toml"         "$HOME/.config/atuin/config.toml"
 
   # Tmux runtime scripts
   mkdir -p "$HOME/.tmux"
-  ln -sfn "$DOTFILES/tmux/pane-info.sh"  "$HOME/.tmux/pane-info.sh"
-  ln -sfn "$DOTFILES/tmux/open-url.sh"   "$HOME/.tmux/open-url.sh"
-  ln -sfn "$DOTFILES/tmux/log-pane.sh"   "$HOME/.tmux/log-pane.sh"
+  ln -sfn "$DOTFILES/tmux/pane-info.sh" "$HOME/.tmux/pane-info.sh"
+  ln -sfn "$DOTFILES/tmux/open-url.sh"  "$HOME/.tmux/open-url.sh"
+  ln -sfn "$DOTFILES/tmux/log-pane.sh"  "$HOME/.tmux/log-pane.sh"
   chmod +x "$DOTFILES/tmux/"*.sh
 
   # Claude Code
@@ -120,7 +97,6 @@ install_neovim() {
 }
 
 install_sketchybar() {
-  mac_only "Sketchybar" || return 0
   echo ">>> Sketchybar"
   ensure_brew
   # The brew formula itself is in Brewfile (felixkratz/formulae/sketchybar).
@@ -147,9 +123,8 @@ install_sketchybar() {
 }
 
 install_aerospace() {
-  mac_only "Aerospace" || return 0
   echo ">>> Aerospace"
-  # The brew cask itself is in Brewfile.
+  # The brew cask itself is in Brewfile (nikitabobko/tap/aerospace).
   mkdir -p "$HOME/.config/aerospace"
   if [ -f "$HOME/.config/aerospace/aerospace.toml" ] && [ ! -L "$HOME/.config/aerospace/aerospace.toml" ]; then
     cp "$HOME/.config/aerospace/aerospace.toml" "$HOME/.config/aerospace_backup.toml"

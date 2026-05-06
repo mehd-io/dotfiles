@@ -1,7 +1,6 @@
 # dotfiles
 
-> **My productivity setup for macOS. Linux is best-effort.**
-> Window-management bits (Aerospace, Sketchybar, Hiddenbar, Stats, screencapture defaults) are macOS-only. Shell tooling (zsh, tmux, neovim, starship, atuin, fzf, ripgrep, fd, etc.) is portable. `linux.sh` covers the CLI subset on `apt` / `dnf` / `pacman`; macOS-only steps skip themselves with a notice. PRs to harden Linux welcome.
+> **My productivity setup for macOS (Apple Silicon). Not tested on Linux.**
 
 A modern, opinionated development environment for macOS:
 
@@ -85,21 +84,18 @@ After installation, you may want to:
 | File | Purpose |
 |------|---------|
 | `Brewfile` | macOS source of truth: Homebrew formulae + casks. Run with `brew bundle`. Each entry has a one-line comment. |
-| `install.sh` | OS-aware orchestrator. Subcommands install apps, defaults, dotfiles, neovim, sketchybar, aerospace. macOS-only steps skip themselves on Linux. |
+| `install.sh` | Orchestrator with subcommand flags: apps, defaults, dotfiles, neovim, sketchybar, aerospace. |
 | `macos.sh` | macOS `defaults write` settings, one comment per line. Safe to run standalone. |
-| `linux.sh` | Linux best-effort: detects `apt` / `dnf` / `pacman` and installs the portable CLI subset. |
 
 ## What Each Subcommand Does
 
 ### `--apps`
 
-**macOS:** runs `brew bundle --file=Brewfile`. Installs all CLI tools (neovim, tmux, atuin, fzf, ripgrep, etc.), data tooling (duckdb, libpq), cloud CLIs (aws, gcloud), window manager + status bar (aerospace, sketchybar, hiddenbar, stats), terminal (ghostty), and apps (1Password, Raycast, Obsidian, Notion, Slack, Spotify, Brave, Chrome, Firefox, Cursor, Claude Desktop, etc.).
-
-**Linux:** runs `linux.sh`, which detects `apt` / `dnf` / `pacman` and installs the portable CLI subset (no GUI casks, no macOS tools). starship, atuin, and yazi fall back to their official install scripts when not packaged.
+Runs `brew bundle --file=Brewfile`. Installs all CLI tools (neovim, tmux, atuin, fzf, ripgrep, etc.), data tooling (duckdb, libpq), cloud CLIs (aws, gcloud), window manager + status bar (aerospace, sketchybar, hiddenbar, stats), terminal (ghostty), and apps (1Password, Raycast, Obsidian, Notion, Slack, Spotify, Brave, Chrome, Firefox, Cursor, Claude Desktop, etc.).
 
 ### `--defaults`
 
-macOS only. Runs `macos.sh`. Sets dock, menu bar, keyboard, text input (disables smart quotes / em-dash substitution), Finder, screenshot, animation, and multi-monitor preferences. Each line is annotated; comment out anything you want to skip. Skipped on Linux with a notice.
+Runs `macos.sh`. Sets dock, menu bar, keyboard, text input (disables smart quotes / em-dash substitution), Finder, screenshot, animation, and multi-monitor preferences. Each line is annotated; comment out anything you want to skip.
 
 ### `--dotfiles`
 
@@ -122,11 +118,11 @@ Clones the [LazyVim](https://www.lazyvim.org/) starter into `~/.config/nvim`. Sk
 
 ### `--sketchybar`
 
-macOS only. Symlinks the sketchybar config to `~/.config/sketchybar`, downloads [sketchybar-app-font](https://github.com/kvndrsslr/sketchybar-app-font) for workspace app icons, and restarts the brew service. The sketchybar formula itself comes from `--apps`. Skipped on Linux.
+Symlinks the sketchybar config to `~/.config/sketchybar`, downloads [sketchybar-app-font](https://github.com/kvndrsslr/sketchybar-app-font) for workspace app icons, and restarts the brew service. The sketchybar formula itself comes from `--apps`.
 
 ### `--aerospace`
 
-macOS only. Symlinks `aerospace.toml` to `~/.config/aerospace/aerospace.toml`. The aerospace cask comes from `--apps`. Skipped on Linux.
+Symlinks `aerospace.toml` to `~/.config/aerospace/aerospace.toml`. The aerospace cask comes from `--apps`.
 
 ---
 
