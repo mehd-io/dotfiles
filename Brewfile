@@ -40,7 +40,7 @@ cask "gcloud-cli"                    # Google Cloud CLI
 
 # === Status bar / window mgmt ===
 brew "felixkratz/formulae/sketchybar"  # custom macOS status bar
-cask "aerospace"                     # i3-style tiling window manager
+cask "nikitabobko/tap/aerospace"     # i3-style tiling window manager
 cask "hiddenbar"                     # hide menu bar icons you do not want visible
 cask "stats"                         # CPU/RAM/network in menu bar
 
