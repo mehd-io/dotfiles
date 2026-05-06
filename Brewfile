@@ -75,10 +75,8 @@ cask "firefox"                       # browser
 cask "ollama"                        # local LLM runner
 cask "keka"                          # archive utility (rar, 7z, etc)
 
-# === Optional: large or infrequent. Uncomment what you need. ===
+# === Optional: uncomment if needed ===
 # cask "vlc"                         # media player (~100MB)
-# cask "libreoffice"                 # office suite (~600MB, slow download)
-# cask "displaylink"                 # DisplayLink dock driver
 # cask "nordvpn"                     # VPN (skip if Tailscale covers your needs)
 # cask "visual-studio-code"          # you mostly use Cursor now
 
