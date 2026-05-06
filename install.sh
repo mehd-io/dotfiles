@@ -1,22 +1,32 @@
 #!/usr/bin/env bash
-# install.sh: dotfiles bootstrap for macOS.
+# install.sh: dotfiles bootstrap. macOS-first, Linux best-effort.
 # Idempotent. Run any subset via flags.
 #
 # Usage:
 #   ./install.sh                  full install (apps + defaults + dotfiles + neovim + sketchybar + aerospace)
 #   ./install.sh --full           same as no args
-#   ./install.sh --apps           Homebrew packages from Brewfile
-#   ./install.sh --defaults       macOS defaults (runs macos.sh)
+#   ./install.sh --apps           macOS: brew bundle from Brewfile. Linux: runs linux.sh
+#   ./install.sh --defaults       macOS only: runs macos.sh. Skipped on Linux
 #   ./install.sh --dotfiles       symlinks (zsh, tmux, ghostty, starship, atuin, claude, borders) + chmods
 #   ./install.sh --neovim         clone LazyVim starter into ~/.config/nvim
-#   ./install.sh --sketchybar     symlink config + download sketchybar-app-font + restart service
-#   ./install.sh --aerospace      symlink aerospace.toml
+#   ./install.sh --sketchybar     macOS only: symlink config + download font + restart service
+#   ./install.sh --aerospace      macOS only: symlink aerospace.toml
 #   ./install.sh --help
 
 set -e
 
 DOTFILES="$HOME/.dotfiles"
 BACKUP_DIR="$HOME/dotfiles-backup"
+OS="$(uname -s)"
+
+mac_only() {
+  # Returns 0 if on macOS, 1 otherwise (with a skip message)
+  if [ "$OS" != "Darwin" ]; then
+    echo ">>> $1 is macOS-only, skipping on $OS"
+    return 1
+  fi
+  return 0
+}
 
 # --- helpers -------------------------------------------------------------
 
@@ -30,12 +40,25 @@ ensure_brew() {
 # --- subcommands ---------------------------------------------------------
 
 install_apps() {
-  echo ">>> apps (brew bundle)"
-  ensure_brew
-  brew bundle --file="$DOTFILES/Brewfile"
+  case "$OS" in
+    Darwin)
+      echo ">>> apps (brew bundle)"
+      ensure_brew
+      brew bundle --file="$DOTFILES/Brewfile"
+      ;;
+    Linux)
+      echo ">>> apps (linux.sh, portable subset)"
+      bash "$DOTFILES/linux.sh"
+      ;;
+    *)
+      echo "Unsupported OS: $OS. Install packages manually."
+      exit 1
+      ;;
+  esac
 }
 
 install_defaults() {
+  mac_only "macOS defaults" || return 0
   echo ">>> macOS defaults"
   bash "$DOTFILES/macos.sh"
 }
@@ -97,6 +120,7 @@ install_neovim() {
 }
 
 install_sketchybar() {
+  mac_only "Sketchybar" || return 0
   echo ">>> Sketchybar"
   ensure_brew
   # The brew formula itself is in Brewfile (felixkratz/formulae/sketchybar).
@@ -123,6 +147,7 @@ install_sketchybar() {
 }
 
 install_aerospace() {
+  mac_only "Aerospace" || return 0
   echo ">>> Aerospace"
   # The brew cask itself is in Brewfile.
   mkdir -p "$HOME/.config/aerospace"
