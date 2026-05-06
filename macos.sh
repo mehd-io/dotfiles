@@ -108,6 +108,17 @@ defaults write com.apple.finder DisableAllAnimations -bool true
 defaults write com.apple.spaces spans-displays -bool false
 
 
-# --- 8. Apply ------------------------------------------------------------
+# --- 8. Spotlight --------------------------------------------------------
+
+# Disable Spotlight search shortcut (Cmd+Space) — freed for Raycast
+/usr/libexec/PlistBuddy -c "Set :AppleSymbolicHotKeys:64:enabled false" \
+  "$HOME/Library/Preferences/com.apple.symbolichotkeys.plist" 2>/dev/null || true
+
+# Disable Spotlight window shortcut (Cmd+Option+Space)
+/usr/libexec/PlistBuddy -c "Set :AppleSymbolicHotKeys:65:enabled false" \
+  "$HOME/Library/Preferences/com.apple.symbolichotkeys.plist" 2>/dev/null || true
+
+
+# --- 9. Apply ------------------------------------------------------------
 killall Dock Finder SystemUIServer 2>/dev/null || true
-echo "Done. Some changes (menu bar, key repeat) need a logout to fully apply."
+echo "Done. Some changes (menu bar, key repeat, Spotlight shortcuts) need a logout to fully apply."
