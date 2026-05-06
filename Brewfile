@@ -27,6 +27,7 @@ brew "aria2"                         # parallel downloader
 brew "rclone"                        # rsync for cloud storage (S3, GDrive, etc)
 brew "yt-dlp"                        # YouTube downloader
 brew "mkvtoolnix"                    # MKV video manipulation (mkvmerge etc)
+brew "oven-sh/bun/bun"               # JavaScript runtime + bundler + package manager
 
 # === Data tooling ===
 brew "duckdb"                        # in-process analytics db
