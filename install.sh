@@ -1,185 +1,166 @@
-#!/bin/sh
-# Script install packages requirements, config files (with symlinks), font and Colors
+#!/usr/bin/env bash
+# install.sh: dotfiles bootstrap for macOS.
+# Idempotent. Run any subset via flags.
+#
+# Usage:
+#   ./install.sh                  full install (apps + defaults + dotfiles + neovim + sketchybar + aerospace)
+#   ./install.sh --full           same as no args
+#   ./install.sh --apps           Homebrew packages from Brewfile
+#   ./install.sh --defaults       macOS defaults (runs macos.sh)
+#   ./install.sh --dotfiles       symlinks (zsh, tmux, ghostty, starship, atuin, claude, borders) + chmods
+#   ./install.sh --neovim         clone LazyVim starter into ~/.config/nvim
+#   ./install.sh --sketchybar     symlink config + download sketchybar-app-font + restart service
+#   ./install.sh --aerospace      symlink aerospace.toml
+#   ./install.sh --help
 
-DOTFILES=$HOME/.dotfiles
-BACKUP_DIR=$HOME/dotfiles-backup
+set -e
 
-echo "=============================="
-echo -e "\n\nBackup existing config ..."
-echo "=============================="
-echo "Creating backup directory at $BACKUP_DIR"
-mkdir -p $BACKUP_DIR
+DOTFILES="$HOME/.dotfiles"
+BACKUP_DIR="$HOME/dotfiles-backup"
 
-linkables=$( find -H "$DOTFILES" -maxdepth 3 -name '*.symlink' )
+# --- helpers -------------------------------------------------------------
 
-# backup up any existing dotfiles in ~ and symlink new ones from .dotfiles
-for file in $linkables; do
-    filename=".$( basename $file '.symlink' )"
-    target="$HOME/$filename"
-    if [ -f $target ]; then
-        echo "backing up $filename"
-        cp $target $BACKUP_DIR
-    else
-        echo -e "$filename does not exist at this location or is a symlink"
+ensure_brew() {
+  if ! command -v brew >/dev/null 2>&1; then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  fi
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+}
+
+# --- subcommands ---------------------------------------------------------
+
+install_apps() {
+  echo ">>> apps (brew bundle)"
+  ensure_brew
+  brew bundle --file="$DOTFILES/Brewfile"
+}
+
+install_defaults() {
+  echo ">>> macOS defaults"
+  bash "$DOTFILES/macos.sh"
+}
+
+install_dotfiles() {
+  echo ">>> dotfiles symlinks"
+  mkdir -p "$BACKUP_DIR"
+
+  # Back up any existing real files in $HOME that match a *.symlink in dotfiles
+  local linkables
+  linkables=$(find -H "$DOTFILES" -maxdepth 3 -name '*.symlink')
+  for file in $linkables; do
+    local filename=".$(basename "$file" '.symlink')"
+    local target="$HOME/$filename"
+    if [ -f "$target" ] && [ ! -L "$target" ]; then
+      echo "backing up $filename"
+      cp "$target" "$BACKUP_DIR"
     fi
-done
+  done
 
-# backup from .config
-folders_to_backup=("borders" "alacritty" "atuin")
+  # Top-level dotfile symlinks
+  ln -sfn "$DOTFILES/zsh/zshrc.symlink"          "$HOME/.zshrc"
+  ln -sfn "$DOTFILES/zsh/zprofile.symlink"       "$HOME/.zprofile"
+  ln -sfn "$DOTFILES/tmux/tmux.conf.symlink"     "$HOME/.tmux.conf"
+  ln -sfn "$DOTFILES/tmux/tmux.conf.local.symlink" "$HOME/.tmux.conf.local"
 
-# Loop through each folder and back it up
-for folder in "${folders_to_backup[@]}"; do
-    original_folder="$HOME/.config/$folder"
-    backup_folder="${original_folder}_backup"
+  # ~/.config/* symlinks
+  mkdir -p "$HOME/.config/borders" "$HOME/.config/ghostty" "$HOME/.config/atuin"
+  ln -sfn "$DOTFILES/borders/bordersrc.symlink"  "$HOME/.config/borders/bordersrc"
+  ln -sfn "$DOTFILES/ghostty/config"             "$HOME/.config/ghostty/config"
+  ln -sfn "$DOTFILES/starship/starship.toml"     "$HOME/.config/starship.toml"
+  ln -sfn "$DOTFILES/atuin/config.toml"          "$HOME/.config/atuin/config.toml"
 
-    if [ -d "$original_folder" ]; then
-        mv "$original_folder" "$backup_folder"
-        echo "Backed up $folder to ${folder}_backup"
-    else
-        echo "Folder $folder does not exist, skipping..."
-    fi
-done
+  # Tmux runtime scripts
+  mkdir -p "$HOME/.tmux"
+  ln -sfn "$DOTFILES/tmux/pane-info.sh"  "$HOME/.tmux/pane-info.sh"
+  ln -sfn "$DOTFILES/tmux/open-url.sh"   "$HOME/.tmux/open-url.sh"
+  ln -sfn "$DOTFILES/tmux/log-pane.sh"   "$HOME/.tmux/log-pane.sh"
+  chmod +x "$DOTFILES/tmux/"*.sh
 
+  # Claude Code
+  mkdir -p "$HOME/.claude"
+  ln -sfn "$DOTFILES/claude/settings.json" "$HOME/.claude/settings.json"
 
-echo "=============================="
-echo -e "\n\nInstalling packages ..."
-echo "=============================="
+  # Default shell
+  if [ "$SHELL" != "/bin/zsh" ]; then
+    chsh -s /bin/zsh || true
+  fi
+}
 
-package_to_install="neovim
-    tmux
-    tree
-    wget
-    zsh
-    curl
-    starship
-    atuin
-"
- if cat /etc/*release | grep ^NAME | grep CentOS; then
-    echo "==============================================="
-    echo "Installing packages $package_to_install on CentOS"
-    echo "==============================================="
-    yum install -y $package_to_install
- elif cat /etc/*release | grep ^NAME | grep Red; then
-    echo "==============================================="
-    echo "Installing packages $package_to_install on RedHat"
-    echo "==============================================="
-    yum install -y $package_to_install
- elif cat /etc/*release | grep ^NAME | grep Fedora; then
-    echo "================================================"
-    echo "Installing packages $package_to_install on Fedorea"
-    echo "================================================"
-    yum install -y $package_to_install
- elif cat /etc/*release | grep ^NAME | grep Ubuntu; then
-    echo "==============================================="
-    echo "Installing packages $package_to_install on Ubuntu"
-    echo "==============================================="
-    apt-get update
-    apt-get install -y $package_to_install
- elif cat /etc/*release | grep ^NAME | grep Debian ; then
-    echo "==============================================="
-    echo "Installing packages $package_to_install on Debian"
-    echo "==============================================="
-    apt-get update
-    apt-get install -y $package_to_install
- elif cat /etc/*release | grep ^NAME | grep Mint ; then
-    echo "============================================="
-    echo "Installing packages $package_to_install on Mint"
-    echo "============================================="
-    apt-get update
-    apt-get install -y $package_to_install
- elif cat /etc/*release | grep ^NAME | grep Knoppix ; then
-    echo "================================================="
-    echo "Installing packages $package_to_install on Kanoppix"
-    echo "================================================="
-    apt-get update
-    apt-get install -y $package_to_install
- elif uname -s | grep Darwin ; then
-    echo "================================================="
-    echo "Installing packages $package_to_install on Mac OS"
-    echo "================================================="
-    brew update
-    brew install $package_to_install
+install_neovim() {
+  echo ">>> LazyVim"
+  if [ ! -d "$HOME/.config/nvim" ]; then
+    git clone https://github.com/LazyVim/starter "$HOME/.config/nvim"
+    rm -rf "$HOME/.config/nvim/.git"
+  else
+    echo "~/.config/nvim already exists, skipping clone"
+  fi
+}
 
-    echo "================================================="
-    echo "Installing additional macOS CLI tools (yazi, fzf, etc.)"
-    echo "================================================="
-    brew install yazi ffmpeg sevenzip jq poppler fd ripgrep fzf zoxide resvg imagemagick font-symbols-only-nerd-font dua-cli
+install_sketchybar() {
+  echo ">>> Sketchybar"
+  ensure_brew
+  # The brew formula itself is in Brewfile (felixkratz/formulae/sketchybar).
+  # This step handles the custom font + config symlink + restart.
 
-    echo "================================================="
-    echo "Installing AWS CLI and Google Cloud CLI"
-    echo "================================================="
-    brew install awscli
-    brew install --cask google-cloud-sdk
- else
-    echo "OS NOT DETECTED, couldn't install package $package_to_install"
-    exit 1;
- fi
+  # sketchybar-app-font: app icons (e.g. :brave_browser:) for workspace labels
+  # https://github.com/kvndrsslr/sketchybar-app-font
+  local font_version="v2.0.51"
+  echo "Installing sketchybar-app-font $font_version"
+  curl -sL -o /tmp/sketchybar-app-font.ttf \
+    "https://github.com/kvndrsslr/sketchybar-app-font/releases/download/${font_version}/sketchybar-app-font.ttf"
+  mkdir -p "$HOME/Library/Fonts"
+  cp /tmp/sketchybar-app-font.ttf "$HOME/Library/Fonts/sketchybar-app-font.ttf"
+  rm -f /tmp/sketchybar-app-font.ttf
 
-echo "================================================="
-echo "Symlink zsh theme, tmux.conf, zshrc"
-echo "================================================="
-echo "Symlinking dotfiles"
-ln -s -f $DOTFILES/zsh/zshrc.symlink $HOME/.zshrc
-ln -s -f $DOTFILES/zsh/zprofile.symlink $HOME/.zprofile
-ln -s $DOTFILES/tmux/tmux.conf.symlink $HOME/.tmux.conf
-ln -s $DOTFILES/tmux/tmux.conf.local.symlink $HOME/.tmux.conf.local
-mkdir -p $HOME/.config/borders
-ln -s $DOTFILES/borders/bordersrc.symlink $HOME/.config/borders/bordersrc
+  # Backup existing config if it is a real dir (not already a symlink)
+  if [ -d "$HOME/.config/sketchybar" ] && [ ! -L "$HOME/.config/sketchybar" ]; then
+    cp -r "$HOME/.config/sketchybar" "$HOME/.config/sketchybar_backup"
+    rm -rf "$HOME/.config/sketchybar"
+  fi
+  ln -sfn "$DOTFILES/sketchybar" "$HOME/.config/sketchybar"
 
-# Symlink Ghostty config
-mkdir -p $HOME/.config/ghostty
-ln -s -f $DOTFILES/ghostty/config $HOME/.config/ghostty/config
+  brew services restart sketchybar || true
+}
 
-# Symlink Starship config
-ln -s -f $DOTFILES/starship/starship.toml $HOME/.config/starship.toml
+install_aerospace() {
+  echo ">>> Aerospace"
+  # The brew cask itself is in Brewfile.
+  mkdir -p "$HOME/.config/aerospace"
+  if [ -f "$HOME/.config/aerospace/aerospace.toml" ] && [ ! -L "$HOME/.config/aerospace/aerospace.toml" ]; then
+    cp "$HOME/.config/aerospace/aerospace.toml" "$HOME/.config/aerospace_backup.toml"
+  fi
+  ln -sfn "$DOTFILES/aerospace/aerospace.toml" "$HOME/.config/aerospace/aerospace.toml"
+}
 
-# Symlink Atuin config
-mkdir -p $HOME/.config/atuin
-ln -s -f $DOTFILES/atuin/config.toml $HOME/.config/atuin/config.toml
+install_full() {
+  install_apps
+  install_defaults
+  install_dotfiles
+  install_neovim
+  install_sketchybar
+  install_aerospace
+  echo ""
+  echo "Full install done. Next steps:"
+  echo "  1. Restart terminal (or source ~/.zshrc)"
+  echo "  2. Log out and back in for Aerospace + menu bar changes"
+  echo "  3. atuin login   # to sync shell history"
+  echo "  4. op signin     # 1Password CLI for secrets injection"
+}
 
-#default bash is zsh
-chsh -s /bin/zsh
+print_usage() {
+  sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'
+}
 
-echo "================================================="
-echo "Install & configure terminal"
-echo "=================================================" 
-brew install --cask ghostty
+# --- main ----------------------------------------------------------------
 
-echo "================================================="
-echo "Install hiddenbar & stats"
-echo "================================================="
-brew install --cask hiddenbar
-brew install --cask stats
-
-echo "================================================="
-echo "Install LazyVim (Neovim config)"
-echo "================================================="
-git clone https://github.com/LazyVim/starter ~/.config/nvim
-rm -rf ~/.config/nvim/.git
-echo "LazyVim installed! Start Neovim with 'nvim' and refer to the comments in the files to customize."
-
-echo "================================================="
-echo "Symlink tmux runtime scripts"
-echo "================================================="
-mkdir -p $HOME/.tmux
-ln -s -f $DOTFILES/tmux/pane-info.sh $HOME/.tmux/pane-info.sh
-ln -s -f $DOTFILES/tmux/open-url.sh $HOME/.tmux/open-url.sh
-ln -s -f $DOTFILES/tmux/log-pane.sh $HOME/.tmux/log-pane.sh
-chmod +x $DOTFILES/tmux/pane-info.sh $DOTFILES/tmux/open-url.sh $DOTFILES/tmux/log-pane.sh
-chmod +x $DOTFILES/tmux/tmux-cleanup.sh
-
-echo "================================================="
-echo "Install Claude Code config"
-echo "================================================="
-mkdir -p $HOME/.claude
-# Symlink settings (hooks, statusLine, model)
-ln -s -f $DOTFILES/claude/settings.json $HOME/.claude/settings.json
-# Make hook and statusline scripts executable
-chmod +x $DOTFILES/tmux/claude-on-busy.sh
-chmod +x $DOTFILES/tmux/claude-on-idle.sh
-chmod +x $DOTFILES/tmux/claude-on-waiting.sh
-chmod +x $DOTFILES/tmux/claude-pretool-check.sh
-chmod +x $DOTFILES/tmux/claude-statusline.sh
-chmod +x $DOTFILES/tmux/tmux-claude-status.sh
-chmod +x $DOTFILES/scripts/claude-search.sh
-echo "Claude Code config installed."
+case "${1:-}" in
+  ""|--full)     install_full ;;
+  --apps)        install_apps ;;
+  --defaults)    install_defaults ;;
+  --dotfiles)    install_dotfiles ;;
+  --neovim)      install_neovim ;;
+  --sketchybar)  install_sketchybar ;;
+  --aerospace)   install_aerospace ;;
+  --help|-h)     print_usage ;;
+  *)             echo "Unknown flag: $1" >&2; print_usage; exit 1 ;;
+esac
