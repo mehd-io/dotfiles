@@ -26,8 +26,7 @@ bindkey -s '^g' 'repo\n'
 export PATH="/Applications/Cursor.app/Contents/Resources/app/bin:$PATH"
 
 
-# opencode
-export PATH="$HOME/.opencode/bin:$PATH"
+# opencode (installed via brew anomalyco/tap/opencode)
 alias oc-sonnet='opencode --model openrouter/anthropic/claude-sonnet-4.6'
 alias oc-gpt5='opencode --model openrouter/openai/gpt-5-nano'
 alias oc-gpt54='opencode --model openrouter/openai/gpt-5.4-nano'

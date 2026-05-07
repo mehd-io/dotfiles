@@ -11,6 +11,7 @@
 #   ./install.sh --neovim         clone LazyVim starter into ~/.config/nvim
 #   ./install.sh --sketchybar     symlink config + download font + restart service
 #   ./install.sh --aerospace      symlink aerospace.toml
+#   ./install.sh --extras         tools not on brew (duckman)
 #   ./install.sh --help
 
 set -e
@@ -138,6 +139,16 @@ install_aerospace() {
   ln -sfn "$DOTFILES/aerospace/aerospace.toml" "$HOME/.config/aerospace/aerospace.toml"
 }
 
+install_extras() {
+  echo ">>> extras (not on brew)"
+  # duckman: DuckDB version manager — installs to ~/.local/bin/duckman
+  if ! command -v duckman >/dev/null; then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/NiclasHaderer/duckdb-version-manager/main/install.sh)"
+  else
+    echo "duckman already installed, skipping"
+  fi
+}
+
 install_full() {
   install_apps
   install_defaults
@@ -145,6 +156,7 @@ install_full() {
   install_neovim
   install_sketchybar
   install_aerospace
+  install_extras
   echo ""
   echo "Full install done. Next steps:"
   echo "  1. Restart terminal (or source ~/.zshrc)"
@@ -167,6 +179,7 @@ case "${1:-}" in
   --neovim)      install_neovim ;;
   --sketchybar)  install_sketchybar ;;
   --aerospace)   install_aerospace ;;
+  --extras)      install_extras ;;
   --help|-h)     print_usage ;;
   *)             echo "Unknown flag: $1" >&2; print_usage; exit 1 ;;
 esac

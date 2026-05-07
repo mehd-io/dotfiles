@@ -68,7 +68,10 @@ cask "obs"                           # screen recording / streaming
 cask "tailscale"                     # VPN mesh
 cask "figma"                         # design
 cask "claude"                        # Claude Desktop app
+cask "claude-code"                   # Claude Code CLI (terminal AI assistant)
 cask "cursor"                        # AI code editor
+brew "anomalyco/tap/opencode"        # OpenCode: AI coding agent for the terminal
+cask "codex"                         # OpenAI Codex CLI agent
 cask "brave-browser"                 # browser (privacy)
 cask "google-chrome"                 # browser
 cask "firefox"                       # browser
