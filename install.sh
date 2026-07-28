@@ -12,6 +12,8 @@
 #   ./install.sh --sketchybar     symlink config + download font + restart service
 #   ./install.sh --aerospace      symlink aerospace.toml
 #   ./install.sh --extras         tools not on brew (duckman)
+#   ./install.sh --toolchain      install pinned runtimes with mise
+#   ./install.sh --continuity     install/link Herdr Continuity + launchd sync
 #   ./install.sh --help
 
 set -e
@@ -149,14 +151,53 @@ install_extras() {
   fi
 }
 
+install_toolchain() {
+  echo ">>> pinned developer toolchain (mise)"
+  ensure_brew
+  mkdir -p "$HOME/.config/mise"
+  ln -sfn "$DOTFILES/mise/mise.toml" "$HOME/.config/mise/config.toml"
+  ln -sfn "$DOTFILES/mise/mise.lock" "$HOME/.config/mise/mise.lock"
+  mise trust "$DOTFILES/mise/mise.toml"
+  mise install -C "$DOTFILES/mise"
+}
+
+install_continuity() {
+  echo ">>> Herdr Continuity"
+  local repo="$HOME/repos/mehd-io/herdr-continuity"
+  if [ ! -d "$repo/.git" ]; then
+    git clone git@github.com:mehd-io/herdr-continuity.git "$repo"
+  fi
+  (
+    cd "$repo"
+    mise trust mise.toml
+    mise install
+    mise exec -- cargo install --locked --path .
+  )
+  herdr plugin link "$repo"
+  local config_dir
+  config_dir=$(herdr plugin config-dir mehd-io.continuity)
+  mkdir -p "$config_dir"
+  ln -sfn "$DOTFILES/herdr-continuity/config.toml" "$config_dir/config.toml"
+
+  mkdir -p "$HOME/Library/LaunchAgents" "$HOME/.local/share/herdr-continuity"
+  sed "s|__HOME__|$HOME|g" \
+    "$DOTFILES/herdr-continuity/io.mehd.herdr-continuity-sync.plist" \
+    > "$HOME/Library/LaunchAgents/io.mehd.herdr-continuity-sync.plist"
+  launchctl bootout "gui/$(id -u)/io.mehd.herdr-continuity-sync" 2>/dev/null || true
+  launchctl bootstrap "gui/$(id -u)" \
+    "$HOME/Library/LaunchAgents/io.mehd.herdr-continuity-sync.plist"
+}
+
 install_full() {
   install_apps
+  install_toolchain
   install_defaults
   install_dotfiles
   install_neovim
   install_sketchybar
   install_aerospace
   install_extras
+  install_continuity
   echo ""
   echo "Full install done. Next steps:"
   echo "  1. Restart terminal (or source ~/.zshrc)"
@@ -180,6 +221,8 @@ case "${1:-}" in
   --sketchybar)  install_sketchybar ;;
   --aerospace)   install_aerospace ;;
   --extras)      install_extras ;;
+  --toolchain)   install_toolchain ;;
+  --continuity)  install_continuity ;;
   --help|-h)     print_usage ;;
   *)             echo "Unknown flag: $1" >&2; print_usage; exit 1 ;;
 esac

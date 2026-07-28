@@ -41,9 +41,9 @@
           },
           {
             "type": "command",
-            "command": "uv run ~/.dotfiles/scripts/sync_claude_to_obsidian.py 2>/dev/null || true",
-            "async": true,
-            "statusMessage": "Syncing session to Obsidian..."
+            "command": "bash ~/.dotfiles/scripts/herdr-continuity-sync.sh push-current 2>/dev/null || true",
+            "statusMessage": "Indexing conversation history...",
+            "async": true
           }
         ]
       }
