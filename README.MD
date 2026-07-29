@@ -149,9 +149,11 @@ Create a 1Password item named `herdr-continuity` with `database-url` and
 and encrypted locally; searchable message projections remain plaintext in
 PostgreSQL by design.
 
-`HERDR_CONTINUITY_AUTO_SYNC` defaults to `0` in the isolated template. Change
-it to `1` only after the dedicated Neon project has sufficient storage, then
-rerun the continuity installer or remove the cached continuity env file.
+`HERDR_CONTINUITY_AUTO_SYNC` is enabled for the upgraded Neon project. Scheduled
+fallback sync runs only from 07:00 to 23:00 local time; explicit handoffs and
+Claude Stop-hook pushes are not restricted by that window. Remote handoff
+receive runs through the same isolated wrapper so it can load the shared
+encryption key from 1Password and fail safely when credentials are unavailable.
 
 ---
 

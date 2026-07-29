@@ -4,6 +4,8 @@ set -euo pipefail
 state_dir="$HOME/.local/share/herdr-continuity"
 env_file="/tmp/.herdr-continuity-env-$(id -u)"
 mkdir -p "$state_dir"
+receive_mode=0
+[[ "${1:-}" == receive ]] && receive_mode=1
 
 # Keep continuity secrets isolated: a missing item never breaks the main shell
 # environment generated from zsh/env.tpl.
@@ -19,14 +21,28 @@ if [[ ! -s "$env_file" ]] ||
   fi
 fi
 
-[[ -s "$env_file" ]] || exit 0
+if [[ ! -s "$env_file" ]]; then
+  if (( receive_mode )); then
+    echo "Continuity receive failed: 1Password environment is unavailable" >&2
+    exit 1
+  fi
+  exit 0
+fi
 # shellcheck disable=SC1090
 source "$env_file"
 
-[[ "${HERDR_CONTINUITY_AUTO_SYNC:-0}" == 1 ]] || exit 0
+if [[ "${HERDR_CONTINUITY_AUTO_SYNC:-0}" != 1 ]] && (( ! receive_mode )); then
+  exit 0
+fi
 
 binary="${HERDR_CONTINUITY_BIN:-$HOME/.cargo/bin/herdr-continuity}"
-[[ -x "$binary" ]] || exit 0
+if [[ ! -x "$binary" ]]; then
+  if (( receive_mode )); then
+    echo "Continuity receive failed: $binary is not installed" >&2
+    exit 1
+  fi
+  exit 0
+fi
 
 if (( $# == 0 )); then
   current_hour=$(date +%H)
