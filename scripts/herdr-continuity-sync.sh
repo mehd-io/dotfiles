@@ -28,6 +28,15 @@ source "$env_file"
 binary="${HERDR_CONTINUITY_BIN:-$HOME/.cargo/bin/herdr-continuity}"
 [[ -x "$binary" ]] || exit 0
 
+if (( $# == 0 )); then
+  current_hour=$(date +%H)
+  start_hour="${HERDR_CONTINUITY_SYNC_START_HOUR:-7}"
+  end_hour="${HERDR_CONTINUITY_SYNC_END_HOUR:-23}"
+  if (( 10#$current_hour < start_hour || 10#$current_hour >= end_hour )); then
+    exit 0
+  fi
+fi
+
 if [[ "${1:-}" == push-current ]]; then
   input=$(cat)
   session_id=$(jq -r '.session_id // empty' <<<"$input")
