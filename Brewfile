@@ -16,6 +16,7 @@ brew "fd"                            # fast find replacement
 brew "ripgrep"                       # fast grep replacement (rg)
 brew "fzf"                           # fuzzy finder
 brew "zoxide"                        # smart cd, jumps to recently used dirs (z, zi)
+brew "mise"                          # pinned language runtimes and developer tools
 brew "yazi"                          # terminal file manager
 brew "dua-cli"                       # interactive disk usage analyzer (dua i)
 brew "ffmpeg"                        # video/audio conversion
@@ -27,7 +28,6 @@ brew "aria2"                         # parallel downloader
 brew "rclone"                        # rsync for cloud storage (S3, GDrive, etc)
 brew "yt-dlp"                        # YouTube downloader
 brew "mkvtoolnix"                    # MKV video manipulation (mkvmerge etc)
-brew "oven-sh/bun/bun"               # JavaScript runtime + bundler + package manager
 
 # === Data tooling ===
 brew "duckdb"                        # in-process analytics db
@@ -68,7 +68,10 @@ cask "obs"                           # screen recording / streaming
 cask "tailscale"                     # VPN mesh
 cask "figma"                         # design
 cask "claude"                        # Claude Desktop app
+cask "claude-code"                   # Claude Code CLI (terminal AI assistant)
 cask "cursor"                        # AI code editor
+brew "anomalyco/tap/opencode"        # OpenCode: AI coding agent for the terminal
+cask "codex"                         # OpenAI Codex CLI agent
 cask "brave-browser"                 # browser (privacy)
 cask "google-chrome"                 # browser
 cask "firefox"                       # browser

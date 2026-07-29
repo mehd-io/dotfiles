@@ -12,6 +12,8 @@ A modern, opinionated development environment for macOS:
 - [**Neovim**](https://neovim.io/) with [**LazyVim**](https://www.lazyvim.org/) — pre-configured, extensible code editing
 - [**Ghostty**](https://ghostty.org/) — fast, native terminal emulator
 - [**Claude Code**](https://docs.anthropic.com/en/docs/claude-code) — AI coding assistant with custom hooks and status line
+- [**mise**](https://mise.jdx.dev/) — pinned Rust, uv, Node, pnpm, and Bun versions across Macs
+- **Herdr Continuity** — searchable Claude/Codex history and encrypted cross-Mac session handoff
 - [**1Password CLI**](https://developer.1password.com/docs/cli/) — secrets injected at login via `op inject`
 - [**Hiddenbar**](https://github.com/dwarvesf/hidden) and [**Stats**](https://github.com/exelban/stats) — menu bar and system monitoring
 
@@ -66,6 +68,8 @@ Run a subset via flags:
 ./install.sh --neovim        # clone LazyVim starter
 ./install.sh --sketchybar    # symlink sketchybar config + install custom font
 ./install.sh --aerospace     # symlink aerospace config
+./install.sh --toolchain     # install exact runtime versions through mise
+./install.sh --continuity    # install/link Herdr Continuity + periodic sync
 ./install.sh --help
 ```
 
@@ -86,6 +90,8 @@ After installation, you may want to:
 | `Brewfile` | macOS source of truth: Homebrew formulae + casks. Run with `brew bundle`. Each entry has a one-line comment. |
 | `install.sh` | Orchestrator with subcommand flags: apps, defaults, dotfiles, neovim, sketchybar, aerospace. |
 | `macos.sh` | macOS `defaults write` settings, one comment per line. Safe to run standalone. |
+| `mise/` | Exact global developer-tool selections and cross-platform lock metadata. |
+| `herdr-continuity/` | Herdr configuration, isolated 1Password template, and launchd definition. |
 
 ## What Each Subcommand Does
 
@@ -123,6 +129,29 @@ Symlinks the sketchybar config to `~/.config/sketchybar`, downloads [sketchybar-
 ### `--aerospace`
 
 Symlinks `aerospace.toml` to `~/.config/aerospace/aerospace.toml`. The aerospace cask comes from `--apps`.
+
+### `--toolchain`
+
+Links the global mise configuration and installs pinned Rust, uv, Node, pnpm,
+and Bun versions. Rust uses rustup underneath; Cargo lockfiles continue to pin
+project dependencies.
+
+### `--continuity`
+
+Builds and installs the Rust `herdr-continuity` binary, links its Herdr plugin,
+and registers an hourly launchd fallback sync. Claude's Stop hook pushes only
+the exact session that stopped. The Herdr picker searches a local cache and never
+wakes the database; `sync` performs an incremental push followed by a
+cursor-based pull.
+
+Create a 1Password item named `herdr-continuity` with `database-url` and
+`encryption-key` fields before enabling database sync. Raw events are compressed
+and encrypted locally; searchable message projections remain plaintext in
+PostgreSQL by design.
+
+`HERDR_CONTINUITY_AUTO_SYNC` defaults to `0` in the isolated template. Change
+it to `1` only after the dedicated Neon project has sufficient storage, then
+rerun the continuity installer or remove the cached continuity env file.
 
 ---
 
@@ -164,6 +193,7 @@ Claude Code is configured via `claude/settings.json` (symlinked to `~/.claude/se
 | PreToolUse (Bash) | `claude-pretool-check.sh` | Blocks duplicate server starts when ports are in use |
 | Notification | `claude-on-waiting.sh` | Sets Claude status to "waiting" |
 | Stop / SubagentStop | `claude-on-idle.sh` | Sets Claude status to "idle" |
+| Stop | `herdr-continuity-sync.sh` | Incrementally pushes the stopped Claude session |
 
 ### Status Line
 

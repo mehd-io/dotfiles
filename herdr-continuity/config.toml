@@ -1,0 +1,10 @@
+vault = "~/Documents/mehdio_sb"
+archive_dir = "~/.local/share/herdr-continuity/archives"
+
+[machines.macbook]
+ssh = "macbook"
+repo_root = "~/repos"
+
+[machines.mac-mini]
+ssh = "mac-mini"
+repo_root = "~/repos"
