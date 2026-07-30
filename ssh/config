@@ -1,0 +1,10 @@
+Host batnas-herdr
+  HostName batnas
+  User batnas
+  IdentityFile ~/.ssh/id_ed25519_batnas
+  IdentitiesOnly yes
+  AddKeysToAgent yes
+  ServerAliveInterval 60
+  ServerAliveCountMax 3
+  RequestTTY no
+  RemoteCommand none

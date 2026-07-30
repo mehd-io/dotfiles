@@ -71,6 +71,22 @@ install_dotfiles() {
   ln -sfn "$DOTFILES/tmux/tmux.conf.symlink"       "$HOME/.tmux.conf"
   ln -sfn "$DOTFILES/tmux/tmux.conf.local.symlink" "$HOME/.tmux.conf.local"
 
+  # Preserve the user's SSH config and include only the versioned Herdr target.
+  mkdir -p "$HOME/.ssh"
+  chmod 700 "$HOME/.ssh"
+  touch "$HOME/.ssh/config"
+  local ssh_include="Include ~/.dotfiles/ssh/config"
+  if ! grep -Fqx "$ssh_include" "$HOME/.ssh/config"; then
+    local ssh_config_tmp="$HOME/.ssh/config.herdr.tmp"
+    {
+      printf '%s\n\n' "$ssh_include"
+      cat "$HOME/.ssh/config"
+    } > "$ssh_config_tmp"
+    chmod 600 "$ssh_config_tmp"
+    mv "$ssh_config_tmp" "$HOME/.ssh/config"
+  fi
+  chmod 600 "$HOME/.ssh/config"
+
   # ~/.config/* symlinks
   mkdir -p "$HOME/.config/borders" "$HOME/.config/ghostty" "$HOME/.config/atuin"
   ln -sfn "$DOTFILES/borders/bordersrc.symlink" "$HOME/.config/borders/bordersrc"

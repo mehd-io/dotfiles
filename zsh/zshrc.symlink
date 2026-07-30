@@ -32,6 +32,7 @@ export PATH="/Applications/Cursor.app/Contents/Resources/app/bin:$PATH"
 alias oc-sonnet='opencode --model openrouter/anthropic/claude-sonnet-4.6'
 alias oc-gpt5='opencode --model openrouter/openai/gpt-5-nano'
 alias oc-gpt54='opencode --model openrouter/openai/gpt-5.4-nano'
+alias hb='herdr --remote batnas-herdr'
 
 # Show active processes/devcontainers when entering a repo directory
 _tmux_repo_status() {

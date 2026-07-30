@@ -109,6 +109,8 @@ Backs up any existing real files in `~` to `~/dotfiles-backup`, then creates sym
 
 - `~/.zshrc`, `~/.zprofile` (Zsh)
 - `~/.tmux.conf`, `~/.tmux.conf.local` (Tmux)
+- `~/.ssh/config` includes the versioned `batnas-herdr` target without replacing
+  existing SSH hosts
 - `~/.tmux/pane-info.sh`, `open-url.sh`, `log-pane.sh` (Tmux runtime scripts)
 - `~/.config/ghostty/config` (Ghostty)
 - `~/.config/starship.toml` (Starship)
@@ -117,6 +119,10 @@ Backs up any existing real files in `~` to `~/dotfiles-backup`, then creates sym
 - `~/.claude/settings.json` (Claude Code hooks and status line)
 
 Sets Zsh as the default shell.
+
+Run `hb` to start or attach to the default Herdr session on `batnas` through
+Herdr's native SSH thin client. The existing `ssh batnas` target continues to
+open tmux.
 
 ### `--neovim`
 
