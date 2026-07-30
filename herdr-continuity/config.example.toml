@@ -1,6 +1,6 @@
-vault = "~/Documents/mehdio_sb"
+vault = "~/Documents/Obsidian"
 archive_dir = "~/.local/share/herdr-continuity/archives"
 
-[machines.batnas]
-ssh = "batnas"
+[machines.remote]
+ssh = "herdr-remote"
 repo_root = "~/repos"

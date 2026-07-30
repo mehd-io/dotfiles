@@ -68,7 +68,7 @@ defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 # Show hidden files (dotfiles) in Finder. Cmd+Shift+. also toggles this
 defaults write com.apple.finder AppleShowAllFiles -bool true
 
-# Finder window title shows full POSIX path (/Users/mehdio/...) instead of just folder name
+# Finder window title shows the full POSIX path instead of only the folder name
 defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
 
 # Skip the "are you sure you want to change the extension?" warning when renaming

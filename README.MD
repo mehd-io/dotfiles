@@ -69,6 +69,7 @@ Run a subset via flags:
 ./install.sh --sketchybar    # symlink sketchybar config + install custom font
 ./install.sh --aerospace     # symlink aerospace config
 ./install.sh --toolchain     # install exact runtime versions through mise
+./install.sh --personalize   # render private machine metadata from 1Password
 ./install.sh --continuity    # install/link Herdr Continuity + periodic sync
 ./install.sh --help
 ```
@@ -79,7 +80,8 @@ After installation, you may want to:
 1. **Restart your terminal** to apply all shell changes
 2. **Log out and back in** for Aerospace to take effect
 3. **Configure Atuin** by running `atuin login` to sync shell history across machines
-4. **Set up 1Password** — create items referenced in `zsh/env.tpl` (see [Secrets Management](#secrets-management))
+4. **Set up private values** — copy and personalize the example described
+   under [Secrets Management](#secrets-management)
 
 ---
 
@@ -91,7 +93,8 @@ After installation, you may want to:
 | `install.sh` | Orchestrator with subcommand flags: apps, defaults, dotfiles, neovim, sketchybar, aerospace. |
 | `macos.sh` | macOS `defaults write` settings, one comment per line. Safe to run standalone. |
 | `mise/` | Exact global developer-tool selections and cross-platform lock metadata. |
-| `herdr-continuity/` | Herdr configuration, isolated 1Password template, and launchd definition. |
+| `personal/` | Publishable placeholder template for machine-specific metadata. |
+| `herdr-continuity/` | Generic Herdr examples and launchd definition. |
 
 ## What Each Subcommand Does
 
@@ -117,6 +120,26 @@ Backs up any existing real files in `~` to `~/dotfiles-backup`, then creates sym
 - `~/.claude/settings.json` (Claude Code hooks and status line)
 
 Sets Zsh as the default shell.
+
+Run `hb` to start or attach to the configured `herdr-remote` target through
+Herdr's native SSH thin client.
+
+### `--personalize`
+
+Uses one private 1Password template to generate the local
+`~/.ssh/config.d/herdr-remote.conf`. Private inputs and generated files live
+outside this repository with owner-only permissions.
+
+Copy `personal/env.tpl.example` to `~/.config/dotfiles/env.tpl`, replace the
+placeholder `op://` references
+with fields from any local 1Password item, and run:
+
+```bash
+./install.sh --personalize
+```
+
+Resolved values share one owner-only `/tmp` cache for up to three days. Set
+`DOTFILES_ENV_REFRESH=1` when running the command to refresh it immediately.
 
 ### `--neovim`
 
@@ -144,22 +167,24 @@ the exact session that stopped. The Herdr picker searches a local cache and neve
 wakes the database; `sync` performs an incremental push followed by a
 cursor-based pull.
 
-Create a 1Password item named `herdr-continuity` with `database-url` and
-`encryption-key` fields before enabling database sync. Raw events are compressed
-and encrypted locally; searchable message projections remain plaintext in
-PostgreSQL by design.
+Continuity uses the same private template and temporary cache as the shell and
+machine setup. Its credentials are not exported to normal child processes. Raw
+events are compressed and encrypted locally; searchable message projections
+remain plaintext in PostgreSQL by design.
 
-`HERDR_CONTINUITY_AUTO_SYNC` is enabled for the upgraded Neon project. Scheduled
-fallback sync runs only from 07:00 to 23:00 local time; explicit handoffs and
-Claude Stop-hook pushes are not restricted by that window. Remote handoff
-receive runs through the same isolated wrapper so it can load the shared
-encryption key from 1Password and fail safely when credentials are unavailable.
+The generated Continuity configuration uses the generic `remote` machine and
+`herdr-remote` SSH aliases. Scheduling and vault paths come from the private
+personalization environment.
 
 ---
 
 ## Secrets Management
 
-Environment variables (API keys, tokens) are injected at first login via [1Password CLI](https://developer.1password.com/docs/cli/) `op inject`. The template `zsh/env.tpl` contains `op://` references that resolve at runtime and are cached for the session.
+No committed file contains real 1Password vault, item, or account identifiers.
+Keep a single personalized template at `~/.config/dotfiles/env.tpl`; its
+resolved owner-only cache is reused for up to three days and may be cleared on
+restart because it lives in `/tmp`. Set `OP_ACCOUNT` locally only if the CLI
+cannot infer the intended signed-in account.
 
 ---
 

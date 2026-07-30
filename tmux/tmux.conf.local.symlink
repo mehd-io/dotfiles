@@ -16,7 +16,7 @@ bind c new-window -c "$HOME"
 # then uncomment the following line to make Meta + arrow keys mapping work
 #set -ga terminal-overrides "*:kUP3=\e[1;9A,*:kDN3=\e[1;9B,*:kRIT3=\e[1;9C,*:kLFT3=\e[1;9D"
 
-# custom mehdio
+# Local customizations
 setw -g mouse on
 
 # -- vim-style navigation (hjkl) ----------------------------------------------

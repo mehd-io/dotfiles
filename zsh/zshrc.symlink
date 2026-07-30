@@ -1,4 +1,4 @@
-export OBSIDIAN_VAULT="$HOME/Documents/mehdio_sb"
+export OBSIDIAN_VAULT="${OBSIDIAN_VAULT:-$HOME/Documents/Obsidian}"
 
 command -v mise >/dev/null 2>&1 && eval "$(mise activate zsh)"
 
@@ -18,7 +18,9 @@ eval "$(zoxide init zsh)"
 # Quick jump to git repos with fzf (Ctrl+G)
 repo() {
   local dir
-  dir=$(find ~/repos/mehd-io ~/repos/motherduckdb -mindepth 1 -maxdepth 1 -type d 2>/dev/null | fzf --prompt="repo> ")
+  local -a roots
+  roots=("${(@s/:/)${DOTFILES_REPO_ROOTS:-$HOME/repos}}")
+  dir=$(find "${roots[@]}" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | fzf --prompt="repo> ")
   [ -n "$dir" ] && cd "$dir"
 }
 bindkey -s '^g' 'repo\n'
@@ -32,6 +34,7 @@ export PATH="/Applications/Cursor.app/Contents/Resources/app/bin:$PATH"
 alias oc-sonnet='opencode --model openrouter/anthropic/claude-sonnet-4.6'
 alias oc-gpt5='opencode --model openrouter/openai/gpt-5-nano'
 alias oc-gpt54='opencode --model openrouter/openai/gpt-5.4-nano'
+alias hb='herdr --remote herdr-remote'
 
 # Show active processes/devcontainers when entering a repo directory
 _tmux_repo_status() {

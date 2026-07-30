@@ -9,7 +9,7 @@ to Obsidian vault as Markdown files.
 Output: <vault>/chat_history/claude_code/YYYY-MM-DD_HH-MM_<session-short>_<slug>.md
 Idempotent: skips sessions that already have a matching output file.
 
-Reads OBSIDIAN_VAULT env var (fallback: ~/Documents/mehdio_sb).
+Reads OBSIDIAN_VAULT env var (fallback: ~/Documents/Obsidian).
 """
 
 import json
@@ -21,7 +21,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 CLAUDE_PROJECTS = Path.home() / ".claude" / "projects"
-OBSIDIAN_VAULT = Path(os.environ.get("OBSIDIAN_VAULT", str(Path.home() / "Documents" / "mehdio_sb")))
+OBSIDIAN_VAULT = Path(os.environ.get("OBSIDIAN_VAULT", str(Path.home() / "Documents" / "Obsidian")))
 OUTPUT_DIR = OBSIDIAN_VAULT / "chat_history" / "claude_code"
 
 

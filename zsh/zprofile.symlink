@@ -1,11 +1,18 @@
 alias v="nvim"
 alias cc="claude"
-# Secrets injected from 1Password — only once per machine boot (cached in tmpfile)
-_OP_CACHE="/tmp/.op-env-$(id -u)"
-if [ ! -f "$_OP_CACHE" ] || [ "$(( $(date +%s) - $(stat -f %m "$_OP_CACHE") ))" -gt 86400 ]; then
-  op inject -i ~/.dotfiles/zsh/env.tpl > "$_OP_CACHE" 2>/dev/null && chmod 600 "$_OP_CACHE"
+
+# Resolve one private template into one owner-only cache shared by shell and
+# Continuity. Only values explicitly exported by the template reach commands.
+_DOTFILES_ENV_CACHE=$(bash "$HOME/.dotfiles/scripts/ensure-dotfiles-env.sh" 2>/dev/null || true)
+if [ -r "$_DOTFILES_ENV_CACHE" ]; then
+  source "$_DOTFILES_ENV_CACHE"
+  unset DOTFILES_REMOTE_HOST DOTFILES_REMOTE_USER
+  unset DOTFILES_REMOTE_IDENTITY_FILE DOTFILES_REMOTE_REPO_ROOT
+  unset HERDR_CONTINUITY_DATABASE_URL HERDR_CONTINUITY_KEY
+  unset HERDR_CONTINUITY_AUTO_SYNC
+  unset HERDR_CONTINUITY_SYNC_START_HOUR HERDR_CONTINUITY_SYNC_END_HOUR
 fi
-[ -f "$_OP_CACHE" ] && source "$_OP_CACHE"
+unset _DOTFILES_ENV_CACHE
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 
