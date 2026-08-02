@@ -11,6 +11,7 @@ brew "bash"                          # newer bash (system bash is stuck on 3.2)
 brew "starship"                      # prompt (Pastel Powerline preset)
 brew "atuin"                         # shell history sync across machines
 brew "gh"                            # GitHub CLI
+brew "jnsahaj/lumen/lumen"          # terminal diff review + agent annotation handoff
 brew "jq"                            # JSON processor
 brew "fd"                            # fast find replacement
 brew "ripgrep"                       # fast grep replacement (rg)
