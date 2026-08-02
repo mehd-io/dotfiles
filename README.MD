@@ -64,7 +64,7 @@ Run a subset via flags:
 ```bash
 ./install.sh --apps          # Homebrew packages from Brewfile
 ./install.sh --defaults      # macOS defaults (runs macos.sh)
-./install.sh --dotfiles      # symlinks for zsh, tmux, ghostty, starship, atuin, claude, borders
+./install.sh --dotfiles      # symlinks for zsh, tmux, ghostty, starship, atuin, Claude, Codex, borders
 ./install.sh --neovim        # clone LazyVim starter
 ./install.sh --sketchybar    # symlink sketchybar config + install custom font
 ./install.sh --aerospace     # symlink aerospace config
@@ -79,7 +79,7 @@ After installation, you may want to:
 1. **Restart your terminal** to apply all shell changes
 2. **Log out and back in** for Aerospace to take effect
 3. **Configure Atuin** by running `atuin login` to sync shell history across machines
-4. **Set up 1Password** — create items referenced in `zsh/env.tpl` (see [Secrets Management](#secrets-management))
+4. **Set up 1Password** — run `./install.sh --dotfiles`, then replace the placeholder references in the private `~/.config/dotfiles/env.tpl` template (see [Secrets Management](#secrets-management))
 
 ---
 
@@ -91,13 +91,13 @@ After installation, you may want to:
 | `install.sh` | Orchestrator with subcommand flags: apps, defaults, dotfiles, neovim, sketchybar, aerospace. |
 | `macos.sh` | macOS `defaults write` settings, one comment per line. Safe to run standalone. |
 | `mise/` | Exact global developer-tool selections and cross-platform lock metadata. |
-| `herdr-continuity/` | Herdr configuration, isolated 1Password template, and launchd definition. |
+| `herdr-continuity/` | Herdr configuration and launchd definition. |
 
 ## What Each Subcommand Does
 
 ### `--apps`
 
-Runs `brew bundle --file=Brewfile`. Installs all CLI tools (neovim, tmux, atuin, fzf, ripgrep, etc.), data tooling (duckdb, libpq), cloud CLIs (aws, gcloud), window manager + status bar (aerospace, sketchybar, hiddenbar, stats), terminal (ghostty), and apps (1Password, Raycast, Obsidian, Notion, Slack, Spotify, Brave, Chrome, Firefox, Cursor, Claude Desktop, etc.).
+Runs `brew bundle --file=Brewfile`. Installs all CLI tools (neovim, tmux, atuin, fzf, ripgrep, Lumen, etc.), data tooling (duckdb, libpq), cloud CLIs (aws, gcloud), window manager + status bar (aerospace, sketchybar, hiddenbar, stats), terminal (ghostty), and apps (1Password, Raycast, Obsidian, Notion, Slack, Spotify, Brave, Chrome, Firefox, Cursor, Claude Desktop, etc.).
 
 ### `--defaults`
 
@@ -115,8 +115,20 @@ Backs up any existing real files in `~` to `~/dotfiles-backup`, then creates sym
 - `~/.config/atuin/config.toml` (Atuin)
 - `~/.config/borders/bordersrc` (Borders)
 - `~/.claude/settings.json` (Claude Code hooks and status line)
+- `~/.claude/CLAUDE.md` (shared agent instructions from the root `AGENTS.md`)
+- `~/.codex/config.toml` (seeded once; managed Chrome DevTools tables synchronized thereafter)
+- `~/.codex/rules/common.rules` (symlinked reviewed command allowlist)
+- `~/.codex/AGENTS.md` (the same shared root agent instructions)
 
 Sets Zsh as the default shell.
+
+Codex keeps mutable project trust, UI state, hook approvals, and machine-specific
+authorization in its local config. On each dotfiles install, the existing file is
+backed up and only the managed Chrome DevTools tables are replaced. All unrelated
+local state is preserved and never enters this public repository. Chrome runs with
+an isolated temporary profile, disabled usage reporting, and disabled CrUX lookups.
+If `~/.codex/config.toml` is itself a symlink, the installer leaves it untouched
+and asks for a manual merge instead of replacing the link.
 
 ### `--neovim`
 
@@ -159,7 +171,13 @@ encryption key from 1Password and fail safely when credentials are unavailable.
 
 ## Secrets Management
 
-Environment variables (API keys, tokens) are injected at first login via [1Password CLI](https://developer.1password.com/docs/cli/) `op inject`. The template `zsh/env.tpl` contains `op://` references that resolve at runtime and are cached for the session.
+Environment variables containing API keys and tokens are injected with [1Password CLI](https://developer.1password.com/docs/cli/) `op inject`. The public `env.tpl.example` contains placeholders only; `./install.sh --dotfiles` seeds one private, mode-`0600` template at `~/.config/dotfiles/env.tpl` and never overwrites it.
+
+`zprofile` and the Continuity wrapper resolve that shared template through `scripts/op-env-cache.sh`. The resolved environment is written atomically to a mode-`0600`, user-specific cache under `XDG_RUNTIME_DIR`, `TMPDIR`, or `/tmp`, expires after 24 hours, and is deleted if refresh fails. Set `OP_ENV_CACHE_TTL` to override the lifetime in seconds.
+
+On first install after this change, existing private `shell-secrets.env.tpl` and `herdr-continuity.env.tpl` files are combined into `env.tpl`. The legacy files are retained so the migration is recoverable and can be removed manually after verification.
+
+Never commit concrete `op://` references: vault, item, field, and account identifiers belong only in the private templates.
 
 ---
 
@@ -236,6 +254,7 @@ A comprehensive list of apps and tools I use for development and productivity.
 |------|-------------|
 | [Claude Desktop](https://claude.ai/download) | Claude AI desktop app |
 | [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | AI coding assistant CLI |
+| [Codex](https://openai.com/codex/) | OpenAI coding agent CLI |
 
 ### Window Management & Menu Bar
 
@@ -264,6 +283,7 @@ A comprehensive list of apps and tools I use for development and productivity.
 | [OrbStack](https://orbstack.dev/) | Fast Docker & Linux on macOS |
 | [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-mac.html) | Amazon Web Services CLI |
 | [gcloud CLI](https://cloud.google.com/sdk/docs/install) | Google Cloud CLI |
+| [Yazi](https://github.com/sxyazi/yazi) | Terminal file manager, installed from the Brewfile source of truth |
 | [dua](https://github.com/Byron/dua-cli) | Disk usage analyzer |
 
 ### Browsers

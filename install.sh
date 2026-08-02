@@ -7,8 +7,8 @@
 #   ./install.sh --full           same as no args
 #   ./install.sh --apps           brew bundle from Brewfile
 #   ./install.sh --defaults       macOS defaults (runs macos.sh)
-#   ./install.sh --dotfiles       symlinks (zsh, tmux, ghostty, starship, atuin, claude, borders) + chmods
-#   ./install.sh --neovim         clone LazyVim starter into ~/.config/nvim
+#   ./install.sh --dotfiles       symlinks (zsh, tmux, ghostty, starship, atuin, Claude, Codex, borders) + chmods
+#   ./install.sh --neovim         clone LazyVim starter and link portable plugins
 #   ./install.sh --sketchybar     symlink config + download font + restart service
 #   ./install.sh --aerospace      symlink aerospace.toml
 #   ./install.sh --extras         tools not on brew (duckman)
@@ -84,10 +84,75 @@ install_dotfiles() {
   ln -sfn "$DOTFILES/tmux/open-url.sh"  "$HOME/.tmux/open-url.sh"
   ln -sfn "$DOTFILES/tmux/log-pane.sh"  "$HOME/.tmux/log-pane.sh"
   chmod +x "$DOTFILES/tmux/"*.sh
+  chmod +x "$DOTFILES/scripts/op-env-cache.sh"
+  chmod +x "$DOTFILES/scripts/sync-codex-config.sh"
 
   # Claude Code
   mkdir -p "$HOME/.claude"
   ln -sfn "$DOTFILES/claude/settings.json" "$HOME/.claude/settings.json"
+
+  # Shared agent instructions: one reviewed source for Claude Code and Codex.
+  if [ -f "$HOME/.claude/CLAUDE.md" ] && [ ! -L "$HOME/.claude/CLAUDE.md" ]; then
+    echo "backing up .claude/CLAUDE.md"
+    cp "$HOME/.claude/CLAUDE.md" "$BACKUP_DIR/claude-CLAUDE.md"
+  fi
+  ln -sfn "$DOTFILES/AGENTS.md" "$HOME/.claude/CLAUDE.md"
+
+  # Codex: preserve mutable local state while syncing reviewed portable settings.
+  mkdir -p "$HOME/.codex/rules"
+  if [ ! -e "$HOME/.codex/config.toml" ]; then
+    cp "$DOTFILES/codex/config.base.toml" "$HOME/.codex/config.toml"
+    printf '\n' >> "$HOME/.codex/config.toml"
+    cat "$DOTFILES/codex/chrome-devtools.toml" >> "$HOME/.codex/config.toml"
+    chmod 600 "$HOME/.codex/config.toml"
+  elif [ -L "$HOME/.codex/config.toml" ]; then
+    echo "~/.codex/config.toml is a symlink; leaving its external config unchanged"
+    echo "Merge codex/chrome-devtools.toml into its source manually"
+  else
+    echo "backing up .codex/config.toml"
+    cp "$HOME/.codex/config.toml" "$BACKUP_DIR/codex-config.toml"
+    bash "$DOTFILES/scripts/sync-codex-config.sh" \
+      "$HOME/.codex/config.toml" \
+      "$DOTFILES/codex/chrome-devtools.toml"
+    echo "Updated managed Chrome DevTools settings; preserved other local Codex state"
+  fi
+  if [ -f "$HOME/.codex/rules/common.rules" ] && [ ! -L "$HOME/.codex/rules/common.rules" ]; then
+    echo "backing up .codex/rules/common.rules"
+    cp "$HOME/.codex/rules/common.rules" "$BACKUP_DIR/codex-common.rules"
+  fi
+  ln -sfn "$DOTFILES/codex/rules/common.rules" "$HOME/.codex/rules/common.rules"
+  if [ -f "$HOME/.codex/AGENTS.md" ] && [ ! -L "$HOME/.codex/AGENTS.md" ]; then
+    echo "backing up .codex/AGENTS.md"
+    cp "$HOME/.codex/AGENTS.md" "$BACKUP_DIR/codex-AGENTS.md"
+  fi
+  ln -sfn "$DOTFILES/AGENTS.md" "$HOME/.codex/AGENTS.md"
+
+  # Seed private 1Password templates once. These mutable files must never be
+  # symlinked back into the public dotfiles repository.
+  local private_config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles"
+  mkdir -p "$private_config_dir"
+  chmod 700 "$private_config_dir"
+  if [ ! -e "$private_config_dir/env.tpl" ]; then
+    local legacy_shell="$private_config_dir/shell-secrets.env.tpl"
+    local legacy_continuity="$private_config_dir/herdr-continuity.env.tpl"
+    if [ -f "$legacy_shell" ] || [ -f "$legacy_continuity" ]; then
+      local merged_template
+      merged_template=$(mktemp "$private_config_dir/.env.tpl.XXXXXX")
+      if [ -f "$legacy_shell" ]; then
+        cat "$legacy_shell" >> "$merged_template"
+        printf '\n' >> "$merged_template"
+      fi
+      [ ! -f "$legacy_continuity" ] || cat "$legacy_continuity" >> "$merged_template"
+      chmod 600 "$merged_template"
+      mv "$merged_template" "$private_config_dir/env.tpl"
+      echo "Combined legacy private templates into ~/.config/dotfiles/env.tpl"
+      echo "Legacy templates were retained for manual cleanup"
+    else
+      cp "$DOTFILES/env.tpl.example" "$private_config_dir/env.tpl"
+      chmod 600 "$private_config_dir/env.tpl"
+      echo "Created private 1Password environment template; replace its placeholder references"
+    fi
+  fi
 
   # Default shell
   if [ "$SHELL" != "/bin/zsh" ]; then
@@ -103,6 +168,12 @@ install_neovim() {
   else
     echo "~/.config/nvim already exists, skipping clone"
   fi
+
+  # Portable, reviewed plugin specs live in dotfiles; LazyVim runtime state stays local.
+  mkdir -p "$HOME/.config/nvim/lua/plugins"
+  ln -sfn \
+    "$DOTFILES/nvim/lua/plugins/git-review.lua" \
+    "$HOME/.config/nvim/lua/plugins/git-review.lua"
 }
 
 install_sketchybar() {

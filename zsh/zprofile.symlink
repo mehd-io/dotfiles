@@ -1,12 +1,23 @@
 alias v="nvim"
 alias cc="claude"
-# Secrets injected from 1Password — only once per machine boot (cached in tmpfile)
-_OP_CACHE="/tmp/.op-env-$(id -u)"
-if [ ! -f "$_OP_CACHE" ] || [ "$(( $(date +%s) - $(stat -f %m "$_OP_CACHE") ))" -gt 86400 ]; then
-  op inject -i ~/.dotfiles/zsh/env.tpl > "$_OP_CACHE" 2>/dev/null && chmod 600 "$_OP_CACHE"
+
+# Make Homebrew-installed tools available before loading 1Password secrets.
+if [ -x /opt/homebrew/bin/brew ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [ -x /usr/local/bin/brew ]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+elif command -v brew >/dev/null 2>&1; then
+  eval "$(brew shellenv)"
 fi
-[ -f "$_OP_CACHE" ] && source "$_OP_CACHE"
-eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# Secrets are injected from a machine-local 1Password template and cached in
+# the private temporary runtime directory for up to 24 hours.
+_OP_TEMPLATE="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/env.tpl"
+if _OP_CACHE=$(bash "$HOME/.dotfiles/scripts/op-env-cache.sh" "$_OP_TEMPLATE" environment 2>/dev/null); then
+  # shellcheck disable=SC1090
+  source "$_OP_CACHE"
+fi
+unset _OP_CACHE _OP_TEMPLATE
 
 
 # AWS

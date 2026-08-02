@@ -1,0 +1,71 @@
+# Managed by dotfiles. The temporary browser profile is deleted after each MCP
+# session, keeping approved test interactions separate from personal browsing.
+[mcp_servers.chrome-devtools]
+command = "npx"
+args = [
+  "-y",
+  "chrome-devtools-mcp@1.2.0",
+  "--isolated",
+  "--no-usage-statistics",
+  "--no-performance-crux",
+]
+
+[mcp_servers.chrome-devtools.tools.list_pages]
+approval_mode = "approve"
+
+[mcp_servers.chrome-devtools.tools.select_page]
+approval_mode = "approve"
+
+[mcp_servers.chrome-devtools.tools.close_page]
+approval_mode = "approve"
+
+[mcp_servers.chrome-devtools.tools.new_page]
+approval_mode = "approve"
+
+[mcp_servers.chrome-devtools.tools.navigate_page]
+approval_mode = "approve"
+
+[mcp_servers.chrome-devtools.tools.take_snapshot]
+approval_mode = "approve"
+
+[mcp_servers.chrome-devtools.tools.take_screenshot]
+approval_mode = "approve"
+
+[mcp_servers.chrome-devtools.tools.click]
+approval_mode = "approve"
+
+[mcp_servers.chrome-devtools.tools.fill]
+approval_mode = "approve"
+
+[mcp_servers.chrome-devtools.tools.fill_form]
+approval_mode = "approve"
+
+[mcp_servers.chrome-devtools.tools.type_text]
+approval_mode = "approve"
+
+[mcp_servers.chrome-devtools.tools.press_key]
+approval_mode = "approve"
+
+[mcp_servers.chrome-devtools.tools.wait_for]
+approval_mode = "approve"
+
+[mcp_servers.chrome-devtools.tools.hover]
+approval_mode = "approve"
+
+[mcp_servers.chrome-devtools.tools.drag]
+approval_mode = "approve"
+
+[mcp_servers.chrome-devtools.tools.handle_dialog]
+approval_mode = "approve"
+
+[mcp_servers.chrome-devtools.tools.resize_page]
+approval_mode = "approve"
+
+[mcp_servers.chrome-devtools.tools.list_console_messages]
+approval_mode = "approve"
+
+[mcp_servers.chrome-devtools.tools.list_network_requests]
+approval_mode = "approve"
+
+[mcp_servers.chrome-devtools.tools.get_network_request]
+approval_mode = "approve"
