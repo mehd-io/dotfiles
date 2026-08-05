@@ -26,3 +26,6 @@ When these instructions are loaded from the dotfiles repository itself, that rep
 - Launch Lumen so its stdout is captured by the agent. Treat annotations returned with Lumen's `s` action as user feedback to address.
 - Lumen annotations, marking files viewed, closing Lumen, or returning no annotations do not constitute approval to stage, commit, push, or create/update a pull request. Require the user's explicit approval in the conversation.
 - Do not configure Lumen AI providers or store API keys unless the user explicitly requests it. The diff viewer and annotation workflow do not require AI credentials.
+- `herdr-review [base-ref]` opens a dedicated review pane for `base-ref...HEAD`, splitting right at a 0.6 ratio and zooming it. `base-ref` defaults to `origin/HEAD`, falling back to `origin/main`.
+- `herdr-review` only runs inside a Herdr-managed pane (it requires `HERDR_ENV=1`) and needs `git`, `herdr`, `jq`, and `nvim` available. It is machine-local in `~/.local/bin` and not tracked in this repository.
+- `herdr-review` currently opens Neovim Diffview, not `lumen diff`. Prefer it when a persistent side-by-side pane is wanted; use `lumen diff` when the review output should be captured as agent-readable annotations.
