@@ -123,8 +123,8 @@ A PreToolUse hook blocks `pnpm dev`, `next dev`, etc. when the port is already i
 | tmux config | `~/.dotfiles/tmux/tmux.conf.symlink` | `~/.tmux.conf` |
 | tmux local | `~/.dotfiles/tmux/tmux.conf.local.symlink` | `~/.tmux.conf.local` |
 | tmux scripts | `~/.dotfiles/tmux/*.sh` | `~/.tmux/*.sh` |
-| Claude settings | `~/.dotfiles/claude/settings.json` | `~/.claude/settings.json` |
-| zsh | `~/.dotfiles/zsh/zshrc.symlink` | `~/.zshrc` |
+| Claude settings | `~/.dotfiles/claude/settings.json` | materialized at `~/.claude/settings.json` |
+| zsh | `~/.dotfiles/zsh/zshrc.symlink` | materialized at `~/.zshrc` |
 | ghostty | `~/.dotfiles/ghostty/config` | `~/.config/ghostty/config` |
 | starship | `~/.dotfiles/starship/starship.toml` | `~/.config/starship.toml` |
 | neovim | `~/.config/nvim/` | (LazyVim, not in dotfiles) |

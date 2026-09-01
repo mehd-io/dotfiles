@@ -1,6 +1,6 @@
 {
   "permissions": {
-    "defaultMode": "auto"
+    "defaultMode": "default"
   },
   "hooks": {
     "PreToolUse": [
@@ -28,6 +28,17 @@
           {
             "type": "command",
             "command": "bash ~/.dotfiles/tmux/claude-on-waiting.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.dotfiles/scripts/herdr-continuity-sync.sh title-hook --provider claude 2>/dev/null || true",
+            "timeout": 3
           }
         ]
       }

@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+  echo "Usage: herdr-review [base-ref]"
+  echo "Open a focused Neovim pane reviewing base-ref...HEAD (default: origin's default branch)."
+  exit 0
+fi
+
+if [[ "${HERDR_ENV:-}" != 1 ]]; then
+  echo "herdr-review must run inside a Herdr-managed pane" >&2
+  exit 1
+fi
+
+for command in git herdr jq nvim; do
+  command -v "$command" >/dev/null 2>&1 || {
+    echo "herdr-review requires $command" >&2
+    exit 1
+  }
+done
+
+repo=$(git rev-parse --show-toplevel 2>/dev/null) || {
+  echo "herdr-review must run inside a Git repository" >&2
+  exit 1
+}
+
+base=${1:-}
+if [[ -z "$base" ]]; then
+  base=$(git -C "$repo" symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null || true)
+  base=${base:-origin/main}
+fi
+
+if [[ ! "$base" =~ ^[A-Za-z0-9._/@-]+$ ]] ||
+   ! git -C "$repo" rev-parse --verify --quiet "$base^{commit}" >/dev/null; then
+  echo "Unknown or unsafe base ref: $base" >&2
+  exit 1
+fi
+
+split=$(herdr pane split --current --direction right --ratio 0.6 --cwd "$repo" --focus)
+pane=$(jq -er '.result.pane.pane_id' <<<"$split")
+herdr pane rename "$pane" "review: ${base##*/}...HEAD" >/dev/null
+herdr pane run "$pane" "nvim -c 'DiffviewOpen ${base}...HEAD'"
+herdr pane zoom "$pane" --on >/dev/null
