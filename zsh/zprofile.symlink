@@ -13,11 +13,16 @@ fi
 # Secrets are injected from a machine-local 1Password template and cached in
 # the private temporary runtime directory for up to 24 hours.
 _OP_TEMPLATE="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/env.tpl"
-if _OP_CACHE=$(bash "$HOME/.dotfiles/scripts/op-env-cache.sh" "$_OP_TEMPLATE" environment 2>/dev/null); then
+_OP_ACCOUNT_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/op-account"
+_OP_ACCOUNT=""
+if [ -r "$_OP_ACCOUNT_FILE" ]; then
+  IFS= read -r _OP_ACCOUNT < "$_OP_ACCOUNT_FILE"
+fi
+if _OP_CACHE=$(bash "$HOME/.dotfiles/scripts/op-env-cache.sh" "$_OP_TEMPLATE" environment "$_OP_ACCOUNT" 2>/dev/null); then
   # shellcheck disable=SC1090
   source "$_OP_CACHE"
 fi
-unset _OP_CACHE _OP_TEMPLATE
+unset _OP_ACCOUNT _OP_ACCOUNT_FILE _OP_CACHE _OP_TEMPLATE
 
 
 # AWS

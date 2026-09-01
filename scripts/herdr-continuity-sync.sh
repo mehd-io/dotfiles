@@ -3,12 +3,21 @@ set -euo pipefail
 
 state_dir="$HOME/.local/share/herdr-continuity"
 template="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/env.tpl"
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
+op_env_cache="$script_dir/op-env-cache.sh"
+account_file="${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/op-account"
+op_account=""
+if [[ -r "$account_file" ]]; then
+  IFS= read -r op_account < "$account_file"
+fi
 mkdir -p "$state_dir"
 receive_mode=0
 [[ "${1:-}" == receive ]] && receive_mode=1
+hook_mode=0
+[[ "${1:-}" == title-hook ]] && hook_mode=1
 
 # Reuse the same injected environment cache as the interactive shell.
-if ! env_file=$(bash "$HOME/.dotfiles/scripts/op-env-cache.sh" "$template" environment 2>/dev/null); then
+if ! env_file=$(bash "$op_env_cache" "$template" environment "$op_account" 2>/dev/null); then
   if (( receive_mode )); then
     echo "Continuity receive failed: 1Password environment is unavailable" >&2
     exit 1
@@ -18,7 +27,7 @@ fi
 # shellcheck disable=SC1090
 source "$env_file"
 
-if [[ "${HERDR_CONTINUITY_AUTO_SYNC:-0}" != 1 ]] && (( ! receive_mode )); then
+if [[ "${HERDR_CONTINUITY_AUTO_SYNC:-0}" != 1 ]] && (( ! receive_mode && ! hook_mode )); then
   exit 0
 fi
 

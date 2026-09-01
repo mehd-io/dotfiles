@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-template="${1:?usage: op-env-cache.sh TEMPLATE CACHE_KEY}"
-cache_key="${2:?usage: op-env-cache.sh TEMPLATE CACHE_KEY}"
+template="${1:?usage: op-env-cache.sh TEMPLATE CACHE_KEY [ACCOUNT]}"
+cache_key="${2:?usage: op-env-cache.sh TEMPLATE CACHE_KEY [ACCOUNT]}"
+op_account="${3:-}"
 cache_ttl="${OP_ENV_CACHE_TTL:-86400}"
 
 case "$cache_key" in
@@ -72,7 +73,9 @@ trap cleanup EXIT HUP INT TERM
 
 if [[ ! -s "$cache_file" ]] || (( mtime > now || now - mtime > cache_ttl )); then
   generated=$(mktemp "$cache_dir/$cache_key.env.tmp.XXXXXX")
-  if op inject -i "$template" >"$generated" 2>/dev/null; then
+  op_args=(inject -i "$template")
+  [[ -z "$op_account" ]] || op_args+=(--account "$op_account")
+  if op "${op_args[@]}" >"$generated" 2>/dev/null; then
     chmod 600 "$generated"
     mv -f "$generated" "$cache_file"
     generated=""

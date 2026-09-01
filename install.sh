@@ -7,7 +7,7 @@
 #   ./install.sh --full           same as no args
 #   ./install.sh --apps           brew bundle from Brewfile
 #   ./install.sh --defaults       macOS defaults (runs macos.sh)
-#   ./install.sh --dotfiles       symlinks (zsh, tmux, ghostty, starship, atuin, Claude, Codex, borders) + chmods
+#   ./install.sh --dotfiles       installs reviewed shell config, local extensions, and non-sensitive symlinks
 #   ./install.sh --neovim         clone LazyVim starter and link portable plugins
 #   ./install.sh --sketchybar     symlink config + download font + restart service
 #   ./install.sh --aerospace      symlink aerospace.toml
@@ -65,9 +65,12 @@ install_dotfiles() {
     fi
   done
 
-  # Top-level dotfile symlinks
-  ln -sfn "$DOTFILES/zsh/zshrc.symlink"            "$HOME/.zshrc"
-  ln -sfn "$DOTFILES/zsh/zprofile.symlink"         "$HOME/.zprofile"
+  # Shell startup loads hydrated credentials, so materialize reviewed copies.
+  # Editing the public checkout must not change active startup code.
+  [ ! -L "$HOME/.zshrc" ] || unlink "$HOME/.zshrc"
+  [ ! -L "$HOME/.zprofile" ] || unlink "$HOME/.zprofile"
+  install -m 600 "$DOTFILES/zsh/zshrc.symlink"     "$HOME/.zshrc"
+  install -m 600 "$DOTFILES/zsh/zprofile.symlink"  "$HOME/.zprofile"
   ln -sfn "$DOTFILES/tmux/tmux.conf.symlink"       "$HOME/.tmux.conf"
   ln -sfn "$DOTFILES/tmux/tmux.conf.local.symlink" "$HOME/.tmux.conf.local"
 
@@ -87,9 +90,19 @@ install_dotfiles() {
   chmod +x "$DOTFILES/scripts/op-env-cache.sh"
   chmod +x "$DOTFILES/scripts/sync-codex-config.sh"
 
-  # Claude Code
+  # Install the public Claude base before optional machine-local extensions.
   mkdir -p "$HOME/.claude"
-  ln -sfn "$DOTFILES/claude/settings.json" "$HOME/.claude/settings.json"
+  if [ -f "$HOME/.claude/settings.json" ] && [ ! -L "$HOME/.claude/settings.json" ]; then
+    echo "backing up .claude/settings.json"
+    cp "$HOME/.claude/settings.json" "$BACKUP_DIR/claude-settings.json"
+  fi
+  [ ! -L "$HOME/.claude/settings.json" ] || unlink "$HOME/.claude/settings.json"
+  install -m 600 "$DOTFILES/claude/settings.json" "$HOME/.claude/settings.json"
+
+  # Herdr helper commands on PATH
+  mkdir -p "$HOME/.local/bin"
+  ln -sfn "$DOTFILES/scripts/herdr-review" "$HOME/.local/bin/herdr-review"
+  chmod +x "$DOTFILES/scripts/herdr-review"
 
   # Shared agent instructions: one reviewed source for Claude Code and Codex.
   if [ -f "$HOME/.claude/CLAUDE.md" ] && [ ! -L "$HOME/.claude/CLAUDE.md" ]; then
@@ -98,7 +111,8 @@ install_dotfiles() {
   fi
   ln -sfn "$DOTFILES/AGENTS.md" "$HOME/.claude/CLAUDE.md"
 
-  # Codex: preserve mutable local state while syncing reviewed portable settings.
+  # Codex base and Chrome DevTools settings contain no authorization policy.
+  # A private extension may merge policy after this base is installed.
   mkdir -p "$HOME/.codex/rules"
   if [ ! -e "$HOME/.codex/config.toml" ]; then
     cp "$DOTFILES/codex/config.base.toml" "$HOME/.codex/config.toml"
@@ -116,11 +130,6 @@ install_dotfiles() {
       "$DOTFILES/codex/chrome-devtools.toml"
     echo "Updated managed Chrome DevTools settings; preserved other local Codex state"
   fi
-  if [ -f "$HOME/.codex/rules/common.rules" ] && [ ! -L "$HOME/.codex/rules/common.rules" ]; then
-    echo "backing up .codex/rules/common.rules"
-    cp "$HOME/.codex/rules/common.rules" "$BACKUP_DIR/codex-common.rules"
-  fi
-  ln -sfn "$DOTFILES/codex/rules/common.rules" "$HOME/.codex/rules/common.rules"
   if [ -f "$HOME/.codex/AGENTS.md" ] && [ ! -L "$HOME/.codex/AGENTS.md" ]; then
     echo "backing up .codex/AGENTS.md"
     cp "$HOME/.codex/AGENTS.md" "$BACKUP_DIR/codex-AGENTS.md"
@@ -152,6 +161,28 @@ install_dotfiles() {
       chmod 600 "$private_config_dir/env.tpl"
       echo "Created private 1Password environment template; replace its placeholder references"
     fi
+  fi
+  if [ ! -e "$private_config_dir/op-account" ]; then
+    cp "$DOTFILES/op-account.example" "$private_config_dir/op-account"
+    chmod 600 "$private_config_dir/op-account"
+    echo "Created private 1Password account selector; replace its placeholder"
+  fi
+
+  # Run optional machine-local extensions from a protected directory. The
+  # public repository neither names nor fetches private repositories.
+  local extension_dir="$private_config_dir/install.d"
+  if [ -d "$extension_dir" ]; then
+    chmod 700 "$extension_dir"
+    local extension
+    for extension in "$extension_dir"/*.sh; do
+      [ -f "$extension" ] || continue
+      if [ -L "$extension" ]; then
+        echo "Skipping symlinked private extension: $extension" >&2
+        continue
+      fi
+      echo "Running private extension: $(basename "$extension")"
+      bash "$extension"
+    done
   fi
 
   # Default shell
@@ -237,6 +268,8 @@ install_continuity() {
   local repo="$HOME/repos/mehd-io/herdr-continuity"
   if [ ! -d "$repo/.git" ]; then
     git clone git@github.com:mehd-io/herdr-continuity.git "$repo"
+  else
+    git -C "$repo" pull --ff-only
   fi
   (
     cd "$repo"
@@ -245,10 +278,14 @@ install_continuity() {
     mise exec -- cargo install --locked --path .
   )
   herdr plugin link "$repo"
+  herdr plugin disable mehd-io.auto-name >/dev/null 2>&1 || true
   local config_dir
   config_dir=$(herdr plugin config-dir mehd-io.continuity)
   mkdir -p "$config_dir"
   ln -sfn "$DOTFILES/herdr-continuity/config.toml" "$config_dir/config.toml"
+  bash "$DOTFILES/scripts/sync-codex-hooks.sh" \
+    "$HOME/.codex/hooks.json" \
+    "$DOTFILES/codex/continuity-hook.json"
 
   mkdir -p "$HOME/Library/LaunchAgents" "$HOME/.local/share/herdr-continuity"
   sed "s|__HOME__|$HOME|g" \
@@ -257,6 +294,7 @@ install_continuity() {
   launchctl bootout "gui/$(id -u)/io.mehd.herdr-continuity-sync" 2>/dev/null || true
   launchctl bootstrap "gui/$(id -u)" \
     "$HOME/Library/LaunchAgents/io.mehd.herdr-continuity-sync.plist"
+  echo "Restart Codex and approve the Continuity UserPromptSubmit hook once"
 }
 
 install_full() {

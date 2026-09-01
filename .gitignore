@@ -1,1 +1,11 @@
 .DS_Store
+.env
+.env.*
+!.env.example
+env.tpl
+op-account
+*.pem
+*.key
+auth.json
+settings.local.json
+events.jsonl

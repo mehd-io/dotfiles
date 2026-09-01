@@ -61,3 +61,8 @@ chpwd_functions+=(_tmux_repo_status)
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# motherduck cli begin
+# Added by MotherDuck install script on Tue Aug 25 17:03:13 CEST 2026
+export PATH="$HOME/.motherduck/bin:$PATH"
+# motherduck cli end

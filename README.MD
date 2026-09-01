@@ -105,30 +105,34 @@ Runs `macos.sh`. Sets dock, menu bar, keyboard, text input (disables smart quote
 
 ### `--dotfiles`
 
-Backs up any existing real files in `~` to `~/dotfiles-backup`, then creates symlinks for:
+Backs up existing real files in `~` to `~/dotfiles-backup`. Shell startup files
+are installed as reviewed copies because they load hydrated credentials; editing
+the public checkout does not change active startup code until the installer is
+run explicitly.
 
-- `~/.zshrc`, `~/.zprofile` (Zsh)
+- `~/.zshrc`, `~/.zprofile` (materialized Zsh startup files)
 - `~/.tmux.conf`, `~/.tmux.conf.local` (Tmux)
 - `~/.tmux/pane-info.sh`, `open-url.sh`, `log-pane.sh` (Tmux runtime scripts)
 - `~/.config/ghostty/config` (Ghostty)
 - `~/.config/starship.toml` (Starship)
 - `~/.config/atuin/config.toml` (Atuin)
 - `~/.config/borders/bordersrc` (Borders)
-- `~/.claude/settings.json` (Claude Code hooks and status line)
+- `~/.claude/settings.json` (materialized UI and Continuity hooks)
 - `~/.claude/CLAUDE.md` (shared agent instructions from the root `AGENTS.md`)
-- `~/.codex/config.toml` (seeded once; managed Chrome DevTools tables synchronized thereafter)
-- `~/.codex/rules/common.rules` (symlinked reviewed command allowlist)
+- `~/.codex/config.toml` (mutable local state with managed Chrome DevTools fragments)
 - `~/.codex/AGENTS.md` (the same shared root agent instructions)
 
-Sets Zsh as the default shell.
+After installing its public base, the installer runs regular, non-symlinked
+machine-local extensions from `~/.config/dotfiles/install.d`. That directory is
+mode `0700`; this repository neither names nor fetches private repositories.
+Machine-local tooling can therefore be reapplied without publishing its contents
+or remote location. No extension is required for a safe base install. Sets Zsh
+as the default shell.
 
-Codex keeps mutable project trust, UI state, hook approvals, and machine-specific
-authorization in its local config. On each dotfiles install, the existing file is
-backed up and only the managed Chrome DevTools tables are replaced. All unrelated
-local state is preserved and never enters this public repository. Chrome runs with
-an isolated temporary profile, disabled usage reporting, and disabled CrUX lookups.
-If `~/.codex/config.toml` is itself a symlink, the installer leaves it untouched
-and asks for a manual merge instead of replacing the link.
+Codex keeps mutable project trust, UI state, hooks, rules, and authorization in
+its local home. This repository manages only the Chrome DevTools fragment.
+Chrome runs with an isolated temporary profile, disabled usage reporting, and
+disabled CrUX lookups.
 
 ### `--neovim`
 
@@ -150,16 +154,24 @@ project dependencies.
 
 ### `--continuity`
 
-Builds and installs the Rust `herdr-continuity` binary, links its Herdr plugin,
+Updates, builds, and installs the Rust `herdr-continuity` binary, links its Herdr
+plugin, disables the superseded Auto Name plugin, installs the Codex title hook,
 and registers an hourly launchd fallback sync. Claude's Stop hook pushes only
-the exact session that stopped. The Herdr picker searches a local cache and never
+the exact session that stopped. Claude and Codex prompt hooks asynchronously
+generate one canonical title for Neon, the local picker, and Herdr. The picker
+searches a local cache and never
 wakes the database; `sync` performs an incremental push followed by a
 cursor-based pull.
 
 Create a 1Password item named `herdr-continuity` with `database-url` and
-`encryption-key` fields before enabling database sync. Raw events are compressed
+`encryption-key` fields, and configure `GEMINI_API_KEY`, before enabling database
+sync and title generation. Raw events are compressed
 and encrypted locally; searchable message projections remain plaintext in
 PostgreSQL by design.
+
+On the first Codex launch after installation, approve the Continuity
+`UserPromptSubmit` hook. The hook is fail-open, so naming can never block a
+prompt.
 
 `HERDR_CONTINUITY_AUTO_SYNC` is enabled for the upgraded Neon project. Scheduled
 fallback sync runs only from 07:00 to 23:00 local time; explicit handoffs and
@@ -171,9 +183,9 @@ encryption key from 1Password and fail safely when credentials are unavailable.
 
 ## Secrets Management
 
-Environment variables containing API keys and tokens are injected with [1Password CLI](https://developer.1password.com/docs/cli/) `op inject`. The public `env.tpl.example` contains placeholders only; `./install.sh --dotfiles` seeds one private, mode-`0600` template at `~/.config/dotfiles/env.tpl` and never overwrites it.
+Environment variables containing API keys and tokens are injected with [1Password CLI](https://developer.1password.com/docs/cli/) `op inject`. The public examples contain placeholders only; `./install.sh --dotfiles` seeds a private, mode-`0600` template at `~/.config/dotfiles/env.tpl` and an account selector at `~/.config/dotfiles/op-account`, and never overwrites either file. Set the selector to the account shorthand, sign-in address, account ID, or user ID that owns the referenced vaults.
 
-`zprofile` and the Continuity wrapper resolve that shared template through `scripts/op-env-cache.sh`. The resolved environment is written atomically to a mode-`0600`, user-specific cache under `XDG_RUNTIME_DIR`, `TMPDIR`, or `/tmp`, expires after 24 hours, and is deleted if refresh fails. Set `OP_ENV_CACHE_TTL` to override the lifetime in seconds.
+`zprofile` and the Continuity wrapper resolve that shared template through `scripts/op-env-cache.sh`, passing the private account selector only to that injection command. The resolved environment is written atomically to a mode-`0600`, user-specific cache under `XDG_RUNTIME_DIR`, `TMPDIR`, or `/tmp`, expires after 24 hours, and is deleted if refresh fails. Set `OP_ENV_CACHE_TTL` to override the lifetime in seconds.
 
 On first install after this change, existing private `shell-secrets.env.tpl` and `herdr-continuity.env.tpl` files are combined into `env.tpl`. The legacy files are retained so the migration is recoverable and can be removed manually after verification.
 
@@ -203,7 +215,9 @@ Never commit concrete `op://` references: vault, item, field, and account identi
 
 ## Claude Code Integration
 
-Claude Code is configured via `claude/settings.json` (symlinked to `~/.claude/settings.json`).
+Claude Code's public UI and Continuity hooks are defined by
+`claude/settings.json`. Optional private extensions may merge additional
+user-level configuration after this base is installed.
 
 ### Hooks
 
@@ -212,6 +226,7 @@ Claude Code is configured via `claude/settings.json` (symlinked to `~/.claude/se
 | PreToolUse | `claude-on-busy.sh` | Sets Claude status to "busy" for tmux status line |
 | PreToolUse (Bash) | `claude-pretool-check.sh` | Blocks duplicate server starts when ports are in use |
 | Notification | `claude-on-waiting.sh` | Sets Claude status to "waiting" |
+| UserPromptSubmit | `herdr-continuity-sync.sh` | Generates a canonical session title asynchronously |
 | Stop / SubagentStop | `claude-on-idle.sh` | Sets Claude status to "idle" |
 | Stop | `herdr-continuity-sync.sh` | Incrementally pushes the stopped Claude session |
 
