@@ -4,7 +4,7 @@ CONFIG_DIR="$HOME/.config/sketchybar"
 
 update_space_icons() {
     local sid=$1
-    local apps=$(aerospace list-windows --workspace "$sid" | awk -F'|' '{gsub(/^ *| *$/, "", $2); print $2}')
+    local apps=$("$CONFIG_DIR/plugins/workspace_apps.sh" "$sid")
 
     sketchybar --set space.$sid drawing=on
 

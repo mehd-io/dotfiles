@@ -7,7 +7,7 @@ if [ "$SENDER" = "aerospace_workspace_change" ]; then
   # Update only visible workspaces
   for workspace in $visible_workspaces; do
     is_focused=$(aerospace list-workspaces --format "%{id} %{workspace-is-focused}" | grep "^$workspace " | awk '{print $2}')
-    apps=$(aerospace list-windows --workspace "$workspace" | awk -F'|' '{gsub(/^ *| *$/, "", $2); print $2}')
+    apps=$("$CONFIG_DIR/plugins/workspace_apps.sh" "$workspace")
     
     sketchybar --set space.$workspace drawing=on
     
