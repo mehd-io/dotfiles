@@ -191,6 +191,21 @@ On first install after this change, existing private `shell-secrets.env.tpl` and
 
 Never commit concrete `op://` references: vault, item, field, and account identifiers belong only in the private templates.
 
+### MotherDuck orgs
+
+`mdorg` (`scripts/mdorg.sh`) switches between MotherDuck organizations. Orgs live in a private INI file, `~/.config/dotfiles/mdorg.conf`, seeded from `mdorg.conf.example`; each `[org NAME]` section holds a 1Password token reference plus an optional `region`, `app_url`, and API `host`. Tokens are resolved through the same `op-env-cache.sh` cache, so they are not exported into every shell.
+
+| Command | Purpose |
+|---------|---------|
+| `mdorg` | Pick an org with `fzf` and switch the current shell |
+| `mdorg use <org>` | Switch the current shell to an org |
+| `mdorg ls` | List configured orgs |
+| `mdorg run <org> -- <cmd>` | Run one command against an org (what agents use) |
+| `mdorg open [org]` | Open the org's web UI |
+| `mdorg refresh` | Drop cached tokens |
+
+Switching exports `motherduck_token`, `MOTHERDUCK_TOKEN`, `MD_ORG`, `MOTHERDUCK_APP_URL`, and `motherduck_host` for orgs that set `host`. The `mdorg` skill in `claude/skills/` tells agents how to use it.
+
 ---
 
 ## Tmux

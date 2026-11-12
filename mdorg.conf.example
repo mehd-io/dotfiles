@@ -1,0 +1,26 @@
+# MotherDuck organizations for the `mdorg` command (scripts/mdorg.sh).
+#
+# Copy this file to ~/.config/dotfiles/mdorg.conf and replace the placeholders.
+# Never commit the private copy: it names your vault, item and orgs.
+#
+# The file is a 1Password template: `token` values are op:// references that
+# `op inject` resolves into a short-lived private cache, never onto disk here.
+#
+# Keys per [org NAME] section:
+#   token    required  1Password reference to the org's access token
+#   region   optional  shown by `mdorg ls`
+#   app_url  optional  web UI, used by `mdorg open`
+#   host     optional  API host, exported as motherduck_host; leave out to use the default
+
+[default]
+org = prd
+
+[org prd]
+token   = {{ op://YOUR_VAULT/YOUR_ITEM/MOTHERDUCK_TOKEN_PRD }}
+region  = us-east-1
+app_url = https://app.motherduck.com
+
+[org team-eu]
+token   = {{ op://YOUR_VAULT/YOUR_ITEM/MOTHERDUCK_TOKEN_TEAM_EU }}
+region  = eu-central-1
+app_url = https://app.motherduck.com

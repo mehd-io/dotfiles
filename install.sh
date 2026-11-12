@@ -104,6 +104,12 @@ install_dotfiles() {
   ln -sfn "$DOTFILES/scripts/herdr-review" "$HOME/.local/bin/herdr-review"
   chmod +x "$DOTFILES/scripts/herdr-review"
 
+  # MotherDuck org switcher: command on PATH plus its agent skill.
+  ln -sfn "$DOTFILES/scripts/mdorg.sh" "$HOME/.local/bin/mdorg"
+  chmod +x "$DOTFILES/scripts/mdorg.sh"
+  mkdir -p "$HOME/.claude/skills"
+  ln -sfn "$DOTFILES/claude/skills/mdorg" "$HOME/.claude/skills/mdorg"
+
   # Shared agent instructions: one reviewed source for Claude Code and Codex.
   if [ -f "$HOME/.claude/CLAUDE.md" ] && [ ! -L "$HOME/.claude/CLAUDE.md" ]; then
     echo "backing up .claude/CLAUDE.md"
@@ -166,6 +172,11 @@ install_dotfiles() {
     cp "$DOTFILES/op-account.example" "$private_config_dir/op-account"
     chmod 600 "$private_config_dir/op-account"
     echo "Created private 1Password account selector; replace its placeholder"
+  fi
+  if [ ! -e "$private_config_dir/mdorg.conf" ]; then
+    cp "$DOTFILES/mdorg.conf.example" "$private_config_dir/mdorg.conf"
+    chmod 600 "$private_config_dir/mdorg.conf"
+    echo "Created private MotherDuck org list; replace its placeholder references"
   fi
 
   # Run optional machine-local extensions from a protected directory. The

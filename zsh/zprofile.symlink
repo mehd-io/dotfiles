@@ -24,6 +24,27 @@ if _OP_CACHE=$(bash "$HOME/.dotfiles/scripts/op-env-cache.sh" "$_OP_TEMPLATE" en
 fi
 unset _OP_ACCOUNT _OP_ACCOUNT_FILE _OP_CACHE _OP_TEMPLATE
 
+# MotherDuck org switcher. `mdorg use <org>` (or bare `mdorg` for a picker)
+# changes this shell; everything else goes to scripts/mdorg.sh.
+mdorg () {
+  case "${1:-}" in
+    use)
+      [ -n "${2:-}" ] || { echo "usage: mdorg use <org>" >&2; return 2; }
+      local _mdorg_env
+      _mdorg_env=$(command mdorg env "$2") || return 1
+      eval "$_mdorg_env"
+      echo "MotherDuck org: $MD_ORG"
+      ;;
+    "")
+      local _mdorg_pick
+      _mdorg_pick=$(command mdorg ls --names | fzf --prompt="mdorg> ") || return 1
+      mdorg use "$_mdorg_pick"
+      ;;
+    *)
+      command mdorg "$@"
+      ;;
+  esac
+}
 
 # AWS
 aws-profile-ls () {

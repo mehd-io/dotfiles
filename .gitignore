@@ -3,6 +3,7 @@
 .env.*
 !.env.example
 env.tpl
+mdorg.conf
 op-account
 *.pem
 *.key
