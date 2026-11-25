@@ -14,6 +14,7 @@
 #   ./install.sh --extras         tools not on brew (duckman)
 #   ./install.sh --toolchain      install pinned runtimes with mise
 #   ./install.sh --continuity     install/link Herdr Continuity + launchd sync
+#   ./install.sh --herdr-app      copy Herdr App config + personal mods, link herdr-sync
 #   ./install.sh --help
 
 set -e
@@ -308,6 +309,20 @@ install_continuity() {
   echo "Restart Codex and approve the Continuity UserPromptSubmit hook once"
 }
 
+install_herdr_app() {
+  echo ">>> Herdr App config"
+  if ! command -v herdr-app >/dev/null 2>&1; then
+    echo "herdr-app not installed; skipping"
+    return 0
+  fi
+  # Copied, not symlinked: Herdr hot-reloads real files, and herdr-sync
+  # reports when an installed copy is edited in place.
+  bash "$DOTFILES/herdr-app/install.sh"
+  mkdir -p "$HOME/.local/bin"
+  ln -sfn "$DOTFILES/scripts/herdr-sync" "$HOME/.local/bin/herdr-sync"
+  chmod +x "$DOTFILES/scripts/herdr-sync"
+}
+
 install_full() {
   install_apps
   install_toolchain
@@ -318,6 +333,7 @@ install_full() {
   install_aerospace
   install_extras
   install_continuity
+  install_herdr_app
   echo ""
   echo "Full install done. Next steps:"
   echo "  1. Restart terminal (or source ~/.zshrc)"
@@ -327,7 +343,7 @@ install_full() {
 }
 
 print_usage() {
-  sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'
 }
 
 # --- main ----------------------------------------------------------------
@@ -343,6 +359,7 @@ case "${1:-}" in
   --extras)      install_extras ;;
   --toolchain)   install_toolchain ;;
   --continuity)  install_continuity ;;
+  --herdr-app)   install_herdr_app ;;
   --help|-h)     print_usage ;;
   *)             echo "Unknown flag: $1" >&2; print_usage; exit 1 ;;
 esac

@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# herdr-sync: which repo owns each personal Herdr App mod and config file, and
+# whether the installed copy still matches it. Read-only.
+#
+#   herdr-sync          table of every personal mod and config file
+#   herdr-sync -d NAME  show the diff for one mod (repo -> installed)
+#
+# Repos searched: $HERDR_SYNC_REPOS (space separated), default every
+# ~/repos/mehd-io/herdr-* folder. A mod source is any <repo>/mods/<name>/ or
+# <repo>/mod/<name>/ or <repo>/<name>/ holding a mod.json.
+set -euo pipefail
+app=${HERDR_APP_HOME:-$HOME/.config/herdr-app}
+repos=${HERDR_SYNC_REPOS:-$(ls -d "$HOME"/repos/mehd-io/herdr-*/ 2>/dev/null)}
+# The tracked config: herdr-app/ next to this script's real location (it is
+# symlinked onto PATH by ./install.sh --herdr-app).
+setup=${HERDR_SETUP:-$(cd "$(dirname "$(readlink -f "$0")")/../herdr-app" && pwd)}
+
+# Files Herdr writes into a mod folder or that are editor helpers, not source.
+EXCL=(-x '.*' -x 'gpui-kit.d.ts' -x 'herdr.d.ts' -x 'jsconfig.json')
+
+declare -A src
+for r in $repos "$setup"; do
+  r=${r%/}
+  for d in "$r"/mods/*/ "$r"/mod/*/ "$r"/*/; do
+    [ -f "$d/mod.json" ] || continue
+    n=$(basename "$d")
+    [ "${src[$n]:-}" = "${d%/}" ] && continue
+    [ -n "${src[$n]:-}" ] && echo "warning: mod $n in both ${src[$n]} and $d" >&2
+    src[$n]=${d%/}
+  done
+done
+
+if [ "${1:-}" = "-d" ]; then
+  n=${2:?usage: herdr-sync -d NAME}
+  diff -ru "${EXCL[@]}" "${src[$n]:?no repo owns $n}" "$app/mods/$n" || true
+  exit 0
+fi
+
+shipped=$(jq -r 'keys[] | select(startswith("layout:") | not)' "$app/installed.json")
+tilde() { local t='~'; echo "${1/#$HOME/$t}"; }
+status=0
+printf '%-18s %-10s %s\n' MOD STATE SOURCE
+for d in "$app"/mods/*/; do
+  n=$(basename "$d")
+  grep -qx "$n" <<<"$shipped" && continue
+  s=${src[$n]:-}
+  if [ -z "$s" ]; then state=ORPHAN; status=1
+  elif diff -rq "${EXCL[@]}" "$s" "$d" >/dev/null 2>&1; then state=ok
+  else state=DRIFT; status=1; fi
+  printf '%-18s %-10s %s\n' "$n" "$state" "$(tilde "${s:-(no repo)}")"
+done
+for n in "${!src[@]}"; do
+  [ -d "$app/mods/$n" ] || { printf '%-18s %-10s %s\n' "$n" "not-inst" "$(tilde "${src[$n]}")"; }
+done
+
+echo
+printf '%-26s %s\n' FILE STATE
+cd "$setup"
+for f in keys.json settings.json programs.json layouts/*.json themes/*.json my-icons/*; do
+  [ -f "$f" ] || continue
+  if cmp -s "$setup/$f" "$app/$f"; then state=ok; else state=DRIFT; status=1; fi
+  printf '%-26s %s\n' "$f" "$state"
+done
+exit $status
