@@ -1,0 +1,5 @@
+{
+  "programs": {
+    "codex": { "icon": "my-icons/codex_no_background.svg", "tint": false }
+  }
+}
